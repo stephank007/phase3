@@ -1,0 +1,573 @@
+execution_params:
+  publish : yes
+  moria   : no
+  history : no
+  baseline: yes
+
+config:
+  #path         : \\hratalvfs\PublicMate\\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\מדורים\מדור פרוייקטים ומרה''ס\תיקיות אישיות\איתן כץ\projects\data
+  #web          : \\hratalvfs\PublicMate\\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\מדורים\מדור פרוייקטים ומרה''ס\תיקיות אישיות\איתן כץ\projects\data\web
+  path         : ./data/
+  web          : ./data/web/
+  bin_path     : .
+  requirements : _in/requirements.xlsx
+  shortlist    : _in/requirements-shortlist.xlsx
+  assets       : ./assets
+  risk_map     : _in/risktable.xlsx
+  name         : _in/phase3-bp.xlsx
+  moria        : _in/moria.xlsm
+  rule         : _in/rules_DB.xlsx
+  pmo          : _in/rules_DB.xlsx
+  out          : _out/p3-out.xlsx
+  skeleton     : _out/p3-skeleton.xlsx
+  p3BI         : _out/p3-BI.xlsx
+  gantt        : _out/g_data_x.xlsx
+  reconcile    : _out/reconcile.xlsx
+  late         : _out/late_report.xlsx
+  letters      : _out/letters.xlsx
+  c_status     : _out/current_status.xlsx
+  int-out      : _out/int-out.xlsx
+  dev-cmp      : _out/dev-compare.xlsx
+  sig_file     : ‏‏סבב חתימות 7.10.20.xlsx
+  gantt_bl     : L:\projects\history\data\baseline\g_data_x.xlsx
+  ms_path      : C:\Program Files\Microsoft Office\root\Office16
+  p3-robot     : bp3.py
+  p3-skeleton  : bp3-skeleton.py
+  consolidated : _out\p3-consolidated.xlsx
+  sc_path      : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\מלאי
+  # requirements : \\hmlotemvfs\mzpn181\PublicMzpn181\Logmar\מרהס\מרהס שלב ג\ספריית שיתוף אמלח\דרישות ממערכת SAP הצהלית וממערכת WMS הזכיין.xlsx
+  tasks        : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\מלאי\מרהס שלב ג - קובץ משימות.xlsx
+  transfer     : _in/transfer
+  install      : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\מדורים\מדור פרוייקטים ומרה''ס\תיקיות אישיות\איתן כץ\install
+  risk         : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\ג-סיכונים\risk management.xlsx
+
+history:
+  date         : '2021-01-01'
+  path         : \\hratalvfs\PublicMate\\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\מדורים\מדור פרוייקטים ומרה''ס\תיקיות אישיות\איתן כץ\projects\history\data
+  web          : \\hratalvfs\PublicMate\\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\מדורים\מדור פרוייקטים ומרה''ס\תיקיות אישיות\איתן כץ\projects\history\data\web
+  name         : phase3-bp.xlsx
+  domain       : domain_ref.xlsx
+  out          : p3-out.xlsx
+  out_c        : p3-consolidated.xlsx
+  skeleton     : p3-skeleton.xlsx
+  rule         : rules-dev.xlsx
+  p3BI         : BI\p3-BI.xlsx
+  pmo          : rules_DB.xlsx
+  gantt        : g_data_x.xlsx
+  gantt_bl     : L:\projects\history\data\baseline\g_data_x.xlsx
+  moria        : moria.xlsx
+  moria_out    : moria_out.xlsx
+  sm_path      : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\מלאי
+  letters      : letters.xlsx
+  c_status     : current_status.xlsx
+  consolidated : p3-consolidated.xlsx
+  requirements : h_requirements.xlsx
+
+requirements_type:
+  BP : BP
+  IMP: יישום
+  SAP: פיתוח SAP
+  INT: דרישת ממשק
+  WMS: זכיין
+  BW : דו"חות
+  PRM: הרשאות
+  TST: בדיקות
+  EDU: הדרכות
+  CNV: הסבות
+  TRN: שלב מעבר
+  TMS: מערכת הובלה
+  SRM: נתיבים פלוס
+  INT_Main: ממשק מרכזי
+  GEN: Tasks
+
+program_status_map:
+  bp_status_map:
+    1 - טרם החל        : טרם החל
+    2 - בעבודה         : בעבודה
+    3 - ממתין להצגה    : ממתין להצגה
+    4 - סיכום מסמך     : סיכום מסמך
+    5 - ממתין לאישור   : ממתין לאישור
+    6 - בחתימה         : בחתימה
+    7 - חתום           : חתום
+
+project_milestones:
+  PDR    : חתום
+  C-IMP  : משימת תשתית עלתה לאויר
+  C-SAP  : משימת סאפ עלתה לאויר
+  C-INT  : משימת ממשק עלתה לאויר
+
+contract_ms:
+  מוכנות למפגש עם הזכיין : סיום ואישור מסמכי בלו-פרינט
+
+MTA:
+  סיום ואישור מסמכי בלו-פרינט: PDR
+
+mom_status_map: {
+  טרם החל      : not started,
+  בתהליך       : in progress,
+  ממתין לתשובה : waiting,
+  בוצע         : completed,
+  בוטל         : cancelled
+}
+
+mom_status_order:
+  - cancelled
+  - not started
+  - in progress
+  - waiting
+  - complete
+
+t_shirt_#:
+    D :  0
+    S :  1
+    M :  2
+    L :  3
+    XL:  4
+
+step:
+    completed:
+      - חתום
+      - בוצע
+      - משימה בוצעה במלואה
+#    ms_task  : ["משימת סאפ עלתה לאויר", "סיום הדרכה", "ממשק עלה לאויר", "דו\"ח עלה לאויר", "7 - חתום"]
+
+constraint_type:
+    MFO: "Must Finish On"
+    MSO: "Must Start On"
+
+holidays:
+  - 20200920
+  - 20200927
+  - 20200928
+  - 20201004
+  - 20201005
+  - 20201006
+  - 20201007
+  - 20201008
+
+bdays:
+  holidays   : ['20200920','20200927','20200928','20201004','20201005','20201006','20201007','20201008']
+  bdays      : 'Sun Mon Tue Wed Thu'
+
+bp_life_cycle: ['טרם החל', 'בעבודה', 'ממתין להצגה', 'סיכום מסמך', 'ממתין לאישור', 'בחתימה', 'חתום']
+domains      : ['02: שרשרת אספקה', '01: מלאי ואחסנה']
+domains_fn   : ['detailed_scm.html', 'detailed_sm.html']
+
+sm_cols: 'מדור מוביל	תהליך	ק. אמלח	רמד יישום	רמ"ד אמלח	אבי פרישמן	ישראל שכטר	גלית שלם	אלכס אלכס	שרון רחמים	גלית אדרי	תקווה רובינציק	סוקרי מפקדת	"סוקרי מנהלת
+          סיגל ודניאל"	"חטלו""ג
+          ניסים ממן"	"מקל""ר
+          אריאל שוסטר"	מנהלת	מפקדת
+'
+
+approvals: 
+  - כתיבת מסמך
+  - תיקוף מסמך אמל"ח
+  - 'אישור אבי'
+  - אישור המנהלת
+  - אישור מפקדת
+  - אישור חטלו"ג
+  - אישור מקל"ר
+  - אישור ניר בשן
+  - אישור שגיב שרביט
+
+moria_people_order:
+  - רמד יישום
+  - רמ"ד אמלח
+  - אבי פרישמן
+  - ישראל שכטר
+  - גלית שלם
+  - אלכס אלכס
+  - שרון רחמים
+  - גלית אדרי
+  - תקווה רובינציק
+  - סוקרי מפקדת
+  - סוקרי מנהלת
+  - חטלו"ג
+  - מקל"ר
+  - ניר בשן
+  - שגיב שרביט
+
+moria_scm_people_order:
+    - רמד יישום
+    - רמ"ד אמלח
+    - אבי פרישמן
+    - ישראל שכטר
+    - גדי מליחי
+    - גלית שלם
+    - אלכס אלכס
+    - שרון רחמים
+    - גלית אדרי
+    - תקווה רובינציק
+    - סוקרי מפקדת
+    - סוקרי מנהלת
+    - חטלו"ג
+    - מקל"ר
+    - ניר בשן
+    - שגיב שרביט
+
+english_name: {
+    ישראל שכטר     : Schecter,
+    אלכס אלכס      : Alex,
+    שרון רחמים     : Sharon,
+    גלית אדרי      : Galit,
+    תקווה רובינציק : Tikva,
+    סוקרי מפקדת    : Operation,
+    סוקרי מנהלת    : Sigalit,
+    חטלו"ג         : Nissim,
+    מקל"ר          : Schuster,
+    ניר בשן        : Bashan,
+    שגיב שרביט     : Sharvit,
+    אבי פרישמן     : Frishman,
+    גדי מליחי      : Gadi,
+    גלית שלם       : Galit S.
+}
+
+temsha_convert: {
+  אישור אבי    : מע' מידע לוג',
+  אישור המנהלת : מנהלת מרה"ס,
+  אישור חטלו"ג : חטלו"ג,
+  אישור מפקדת  : מפקדת מרה"ס,
+  אישור מקל"ר  : מקל"ר
+}
+
+moria_convert: {
+    רמד יישום    : כתיבת מסמך,
+    רמ"ד אמלח    : תיקוף מסמך אמל"ח,
+    סוקרי מנהלת  : אישור המנהלת,
+    סוקרי מפקדת  : אישור מפקדת,
+    מקל"ר        : אישור מקל"ר,
+    חטלו"ג       : אישור חטלו"ג,
+    אבי פרישמן   : אישור אבי,
+    ניר בשן      : אישור ניר בשן,
+    שגיב שרביט   : אישור שגיב שרביט
+}
+
+bp_moria_status: {
+  43: נחתם,
+  42: בסקירה,
+  38: טרם החל,
+  44: חזר עם הערות,
+  15: לא רלבנטי,
+  0 : טרם החל,
+  1 : הושלם
+}
+
+bp_moria_color_sequence:
+  - '#92d14f'
+  - '#5b549c'
+  - '#ff7c80'
+  - '#ffc000'
+  - '#d9d9d9'
+
+bp_scm_color_sequence:
+  - '#b4c6e7'
+  - '#ff7c80'
+  - '#ffc000'
+  - '#d9d9d9'
+
+bp_moria_status_order:
+  - נחתם
+  - בסקירה
+  - טרם החל
+  - חזר עם הערות
+  - לא רלבנטי
+
+step_ordered: {
+  1 - כתיבת מסמך       : כתיבת מסמך,
+  2 - תיקוף המסמך      : תיקוף המסמך,
+  3 - אישור דרג מקצועי : אישור דרג מקצועי,
+  4 - אישור מפקדים     : אישור מפקדים
+}
+
+gantt_today: {
+     xanchor: 'right',
+     bordercolor: '#3366CC',
+     ax: -125,
+     y: 0,
+     showarrow: True,
+     bgcolor: 'white',
+     arrowcolor: 'green',
+     arrowhead: 1,
+     arrowsize: 1,
+     arrowwidth: 2,
+     opacity: 0.7,
+     font: {color: '#264E86',
+            family: 'sans serif',
+            size: 18}
+}
+
+rect_dims:
+  x0: [1.01, 1.01, 1.01, 1.01, 1.01, 1.01]
+  x1: [1.13, 1.13, 1.13, 1.13, 1.13, 1.13]
+  y0: [0.84, 0.76, 0.68, 0.60, 0.52, 0.44]
+  y1: [0.78, 0.70, 0.62, 0.54, 0.46, 0.38]
+
+measure_dims:
+  x: [1.127, 1.127, 1.127, 1.127, 1.127, 1.127]
+  y: [0.839, 0.759, 0.679, 0.569, 0.489, 0.409]
+
+rect_attr: {
+  'type': 'rect',
+  'xref': 'paper',
+  'yref': 'paper',
+  'line': {
+    'color': 'rgba(0, 128, 0, 1)',
+    'width': 1,
+  },
+  'fillcolor': 'rgba(0, 128, 0, 0.3)'}
+
+progress_line: {
+   type: line,
+   line: {
+     color: '#500000',
+     width: 4.0
+   },
+   opacity: 1.0
+}
+
+history_line: {
+  type: line,
+  line: {
+    color: '#192ecf',
+    width: 4.0
+  },
+  opacity: 0.5
+}
+
+measure_text:
+  - Blue Prints     <br>
+  - Stock Mgmt BPs  <br>
+  - Supply Chain BPs<br>
+  - Beyond Deadline <br>
+  - BP Completed    <br>
+  - Plan to complete<br>
+
+measure_annotation: {
+  'xref'       : 'paper',
+  'yref'       : 'paper',
+  'align'      : 'left',
+  'showarrow'  : False,
+  'bordercolor': '#c7c7c7',
+  'borderwidth': 0,
+  'borderpad'  : 4,
+#  'bgcolor'    : '#ffffff',
+  'opacity'    : 0.8,
+  'font'       : {'color' : '#000000',
+                  'family': 'Courier New, monospace',
+                  'size'  : 16}
+}
+
+threshold_line: {
+    type: "line",
+    xref: 'x',
+    yref: 'paper',
+    y0: 0.010,
+    y1: 0.990,
+    line: {
+      color: "midnightblue",
+      width: 4.0
+    }
+}
+
+process_ref_columns:
+  - process
+  - domain
+  - RN
+  - row_type
+  - domain_id
+  - process_id
+  - Name
+  - p_owner
+  - waiting
+  - status
+  - due_date
+  - BP
+  - rule
+  - parent
+  - task_notes
+  - t_shirt
+
+skeleton_columns:
+  - RN
+  - xRN
+  - row_type
+  - domain_id
+  - process_id
+  - Name
+  - p_owner
+  - waiting
+  - status
+  - BP
+  - due_date
+  - parent
+  - rule
+  - Deadline
+  - task_notes
+  - task_notes_2
+  - function_requirement_reference
+  - sub_process
+  - source
+  - Outline Level
+  - p_rule
+  - Work
+  - alias
+  - isMS
+  - row_number
+  - pmo_priority
+  - d-start
+  - d-finish
+  - d-pc
+  - lc-RN
+
+consolidated_columns:
+  - RN
+  - xRN
+  - row_type
+  - domain_id
+  - process_id
+  - Name
+  - p_owner
+  - waiting
+  - status
+  - due_date
+  - parent
+  - rule
+  - Deadline
+  - task_notes
+  - task_notes_2
+  - function_requirement_reference
+  - sub_process
+  - source
+  - Outline Level
+  - p_rule
+  - Work
+  - alias
+  - rule
+  - isMS
+  - row_number
+  - task_notes_2
+
+dfP:
+  RN      : Text1
+  waiting : Text2
+  status  : Text3
+  row_type: Text4
+  xRN     : Text5
+  parent  : Text6
+  p_owner : Text7
+  source  : Text8
+  rule    : Text9
+  isMS    : Milestone
+
+dfP_columns:
+  - Outline Level
+  - Start
+  - Finish
+#  - Actual Finish
+  - Constraint Date
+  - Constraint Type
+  - "% Complete"
+  - Duration
+  - Work
+  - Milestone
+  - Predecessors
+  - Text1
+  - Text2
+  - Text3
+  - Text4
+  - Text5
+  - Text6
+  - Text7
+  - Text8
+  - Text9
+  - Name
+  - Deadline
+#  - Resource Names
+
+mom_columns:
+  - RN
+  - row_type
+  - domain_id
+  - process_id
+  - Name
+  - waiting
+  - status
+  - due_date
+  - parent
+  - rule
+  - p_rule
+  - Work
+  - task_notes
+  - task_notes_2
+  - p_owner
+  - source
+
+realization_columns_map: {
+  דרישה מתוך מסמכי ה - BP          : Name,
+  'תת תהליך'                       : sub_process,
+  "WMS/ממשקים/מבנה ארגוני/TMS/SAP" : s_rule,
+  הערות                            : task_notes,
+  הערות אמל"ח                      : task_notes_2,
+  תרחיש                            : domain_id,
+  תהליך                            : process_id
+}
+
+s_rule_map: {
+  מבנה ארגוני    :  SAP,
+  WMS            :  WMS,
+  כפול           :  ignore,
+  ממשקים         :  INT,
+  SAP            :  SAP,
+  BW             :  BW,
+  ממשקים - תומר  :  INT,
+  ל"ר            :  ignore,
+  "?"            :  ignore,
+  הסבה           :  CNV,
+  TMS            :  TMS,
+  'ממשקים: SAP  - תומר' : INT,
+  SAP -> WMS     : SAP,
+  WMS/TMS        : WMS
+}
+
+realization_columns:
+  - RN
+  - xRN
+  - row_type
+  - domain_id
+  - process_id
+  - Name
+  - sub_process
+  - waiting
+  - status
+  - rule
+  - due_date
+  - parent
+  - t_shirt
+  - source
+  - task_notes
+  - task_notes_2
+  - pmo_priority
+  - d-start
+  - d-finish
+  - d-pc
+  - lc-RN
+
+tasks_status_map: {
+  בוטל     : בוטל,
+  ל"ר      : בוטל,
+  טרם החל  : טרם החל,
+  בעבודה   : משימה בעבודה,
+  בוצע     : משימה בוצעה במלואה
+}
+
+tasks_columns_map: {
+  "#"      : serial,
+  משימה    : Name,
+  אחריות   : resposible,
+  אמל"ח    : p_owner,
+  תג"ב לשלב: due_date,
+  סטטוס    : status,
+  הערות    : task_notes,
+  תרחיש    : domain_id,
+  תהליך    : process_id
+}
