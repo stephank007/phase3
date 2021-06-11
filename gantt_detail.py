@@ -255,7 +255,7 @@ fig = px.timeline(
         'Name_Ordered': True,
         'Start_Date'  : True
     },
-    title='Gantt Report: ' + today.strftime('%d/%m/%Y')
+    title='Gantt Report: ' + today.strftime('%d/%m/%Y'),
 )
 for ser in fig['data']:
     ser['hovertemplate'] = \

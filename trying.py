@@ -24,19 +24,23 @@ df_g = df.groupby(['month']).agg({
     'completed': 'sum'
 })
 df_g.reset_index(inplace=True)
+df_g['month-label'] = pd.to_datetime(df_g['month'], format='%Y-%m').dt.strftime('%b-%Y')
 df_g['in-dev'] = ( df_g['in-dev'] / df_g['total'] ) * 100
 df_g['completed'] = ( df_g['completed'] / df_g['total'] ) * 100
 df_g['width'] = ( df_g['total'] / df_g['total'].sum() ) * 100
 
 # labels = ["apples","oranges","pears","bananas"]
-labels = df_g['month']
+labels = df_g['month-label']
 #widths = np.array([10,20,20,50])
 widths = np.array(df_g['width'])
 
 data = {
-    "completed": df_g['completed'],
-    "in-dev"   : df_g['in-dev']
+    "completed": df_g['completed'].astype(int),
+    "in-dev"   : df_g['in-dev'].astype(int),
 }
+
+customdata = [labels.to_list(), df_g['in-dev'].to_list()]
+print(customdata)
 
 fig = go.Figure()
 for key in data:
@@ -46,23 +50,24 @@ for key in data:
         x=np.cumsum(widths)-widths,
         width=widths,
         offset=0,
-        customdata=np.transpose([labels, widths*data[key]]),
-        texttemplate="%{y} x %{width} =<br>%{customdata[1]}",
-        textposition="inside",
+        customdata=np.transpose([labels, data[key]]),
+        texttemplate="%{y} ",
+        #texttemplate="%{y} x %{width} =<br>%{customdata[0]}",
+        # textposition="inside",
+        textposition="auto",
         textangle=0,
-        textfont_color="white",
         hovertemplate="<br>".join([
-            "label: %{customdata[0]}",
-            "width: %{width}",
-            "height: %{y}",
-            "area: %{customdata[1]}",
+            "month: %{customdata[0]}",
+            # "width: %{width}",
+            "requirements: %{y}",
+            #"area: %{customdata[1]}",
         ])
     ))
 
 fig.update_xaxes(
     tickvals=np.cumsum(widths)-widths/2,
     #ticktext= ["%s<br>%d" % (l, w) for l, w in zip(labels, widths)]
-    ticktext = ["%s" % (l) for l, w in zip(labels, widths)]
+    ticktext=["%s" % (l) for l, w in zip(labels, widths)]
 )
 
 fig.update_xaxes(range=[0,100])
