@@ -57,6 +57,12 @@ fig = px.timeline(
     height=800
 )
 
+for ser in fig['data']:
+    c = ser['customdata']
+    ser['hovertemplate'] = \
+        '<b>%{hovertext}</b><br><br>step  = %{customdata[1]}<br>start = %{customdata[2]|%Y-%m-%d}<br>' \
+        'finish= %{x|%Y-%m-%d}<extra></extra>'
+
 server = Flask(__name__)
 app = dash.Dash(
     server=server,
