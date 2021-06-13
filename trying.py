@@ -1,103 +1,69 @@
-import pandas as pd
-import plotly.graph_objects as go
-import plotly.offline as pyo
-import numpy as np
 import os
 import codecs
-import yaml
 
-print(os.getcwd())
+import pandas as pd
+import yaml
+import dash
+import dash_core_components as dcc
+import dash_html_components as html
+
 with codecs.open('./config.yaml', 'r', encoding='utf-8') as f:
     config = yaml.safe_load(f)
 
 path = config['config'].get('path')
-fn = os.path.join(path, './_out/stat-file.xlsx')
-fo = os.path.join(path, './_out/stat-file.html')
-f1 = os.path.join(path, './_out/stat-file-out.xlsx')
+fn = os.path.join(path, config['config'].get('name'))
 
-writer   = pd.ExcelWriter(f1, engine='xlsxwriter')
-workbook = writer.book
+df = pd.read_excel(fn, sheet_name='process_ref')
+df = df[['domain_id', 'process_id']]
 
-df = pd.read_excel(fn, sheet_name='Sheet1')
-df['month'] = pd.to_datetime(df['Finish_Date']).dt.strftime('%Y-%m')
+d_dict = {}
+keys = df['domain_id'].unique()
+for key in keys:
+    p_ids = df[df['domain_id'] == key]['process_id'].to_list()
+    d_dict.update({key: p_ids})
 
-df_g = df.groupby(['month']).agg({
-    'total' : 'sum',
-    'open'  : 'sum',
-    'closed': 'sum'
-})
-df_g.reset_index(inplace=True)
-gt = df_g['total'].sum()
-df_g['month-label'] = pd.to_datetime(df_g['month'], format='%Y-%m').dt.strftime('%b-%Y')
-df_g['% open']      = ( df_g['open'] / df_g['total'] )   * 100
-df_g['% closed']    = ( df_g['closed'] / df_g['total'] ) * 100
-df_g['width']       = ( df_g['total'] / gt )             * 100
+app = dash.Dash()
 
-df_g.to_excel(writer, sheet_name='Sheet1')
-writer.save()
+fnameDict = {'chriddy': ['opt1_c', 'opt2_c', 'opt3_c'], 'jackp': ['opt1_j', 'opt2_j']}
+fnameDict = d_dict
 
-labels = df_g['month-label']
-widths = np.array(df_g['width'])
+names = list(fnameDict.keys())
+nestedOptions = fnameDict[names[0]]
 
-data = {
-    "closed"  : df_g['% closed'].apply(np.ceil),
-    "open"    : df_g['% open'].apply(np.floor),
-}
-colors = {
-    'closed': 'lightslategray',
-    'open'  : 'crimson'
-}
-customdata = np.transpose([labels, data['closed']]),
-print('length --> ', len(customdata))
-df_x = pd.DataFrame(customdata)
-
-fig = go.Figure()
-for key in data:
-    fig.add_trace(go.Bar(
-        name=key,
-        y=data[key],
-        x=np.cumsum(widths)-widths,
-        #x=labels.to_list(),
-        width=widths,
-        marker_color=colors[key],
-        offset=0,
-        customdata=np.transpose([labels, data[key]]),
-        text='from total of '    + df_g['total'].astype(str) + ' requirements' +
-             '<br>open/closed: ' + df_g['open'].astype(str)  + '/' + df_g['closed'].astype(str),
-        textfont_color='lightsalmon',
-        texttemplate="%{y}%",
-        textposition="inside",
-        textangle=0,
-        hovertemplate="<br>".join([
-            "%{customdata[0]}",
-            key + ": %{y}%" ,
-            "%{text}"
-        ]),
-    ))
-
-fig.update_xaxes(
-    tickvals=np.cumsum(widths)-widths/2,
-    #ticktext= ["%s<br>%d" % (l, w) for l, w in zip(labels, widths)]
-    ticktext=["%s" % (l) for l, w in zip(labels, widths)],
+app.layout = html.Div(
+    [
+        html.Div([
+            dcc.Dropdown(
+                id='name-dropdown',
+                options=[{'label':name, 'value':name} for name in names],
+                value = list(fnameDict.keys())[0]
+            ),
+        ],style={'width': '20%', 'display': 'inline-block'}),
+        html.Div([
+            dcc.Dropdown(
+                id='opt-dropdown',
+            ),
+        ],style={'width': '20%', 'display': 'inline-block'}
+        ),
+        html.Hr(),
+        html.Div(id='display-selected-values')
+    ]
 )
 
-fig.update_xaxes(range=[0, 100])
-fig.update_yaxes(range=[0, 100])
-
-fig.update_layout(
-    hoverlabel=dict(
-        bgcolor='white',
-        font_size=16,
-        font_family='Courier New, monospace'
-    )
+@app.callback(
+    dash.dependencies.Output('opt-dropdown', 'options'),
+    [dash.dependencies.Input('name-dropdown', 'value')]
 )
+def update_date_dropdown(name):
+    return [{'label': i, 'value': i} for i in fnameDict[name]]
 
-fig.update_layout(
-    title_text="% open vs. closed - Marimekko Chart",
-    barmode="stack",
-    uniformtext=dict(mode="hide", minsize=10),
-    xaxis={'categoryorder': 'category ascending'},
-    xaxis_tickangle=-45,
-    height=600
-)
-pyo.plot(fig, filename=fo)
+@app.callback(
+    dash.dependencies.Output('display-selected-values', 'children'),
+    [dash.dependencies.Input('opt-dropdown', 'value')])
+def set_display_children(selected_value):
+    return 'you have selected {} option'.format(selected_value)
+
+
+
+if __name__ == '__main__':
+    app.run_server()
