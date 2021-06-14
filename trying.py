@@ -1,6 +1,5 @@
 import os
 import codecs
-
 import pandas as pd
 import yaml
 import dash
@@ -16,7 +15,7 @@ fn = os.path.join(path, config['config'].get('name'))
 df = pd.read_excel(fn, sheet_name='process_ref')
 df = df[['domain_id', 'process_id']]
 
-d_dict = {}
+d_dict = {'Select' : None}
 keys = df['domain_id'].unique()
 for key in keys:
     p_ids = df[df['domain_id'] == key]['process_id'].to_list()
@@ -36,7 +35,7 @@ app.layout = html.Div(
             dcc.Dropdown(
                 id='name-dropdown',
                 options=[{'label':name, 'value':name} for name in names],
-                value = list(fnameDict.keys())[0]
+                # value = list(fnameDict.keys())[0]
             ),
         ],style={'width': '20%', 'display': 'inline-block'}),
         html.Div([
@@ -55,15 +54,15 @@ app.layout = html.Div(
     [dash.dependencies.Input('name-dropdown', 'value')]
 )
 def update_date_dropdown(name):
+    print(update_date_dropdown.__name__, name)
     return [{'label': i, 'value': i} for i in fnameDict[name]]
 
 @app.callback(
     dash.dependencies.Output('display-selected-values', 'children'),
     [dash.dependencies.Input('opt-dropdown', 'value')])
 def set_display_children(selected_value):
+    print(selected_value)
     return 'you have selected {} option'.format(selected_value)
 
-
-
 if __name__ == '__main__':
-    app.run_server()
+    app.run_server(debug=True)

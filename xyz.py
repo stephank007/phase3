@@ -1,20 +1,14 @@
-import re
-import numpy as np
+import plotly.express as px
+import plotly.offline as pyo
 
-a_string = 'א.	אריק 1 4 קרבabc moshe /~!- (מנהל מחסן) 123 , איתי שמר(קצין ...קישור נמלים)'
-b_string = 'אריק 1 4 קרבabc moshe'
+df = px.data.iris()
+fig = px.scatter(df, x="sepal_width", y="sepal_length", color="species")
 
-# x = re.sub('[^A-Za-z0-9א-ת]*', ' ', my_string)
-
-a1 = [character for character in a_string if character.isalnum()]
-a1 = ''.join(a1)
-
-a2 = [character for character in b_string if character.isalnum()]
-a2 = ''.join(a1)
-
-print(a1[0:10] in a1)
-
-z1, z2, z3 = np.random.random((3, 7, 7))
-customdata = np.dstack((z2, z3))
-print(customdata)
-
+fig.update_traces(
+    marker=dict(
+    symbol='diamond-open',
+    size=12,
+    line=dict(width=2, color='DarkSlateGrey')),
+    selector=dict(mode='markers')
+)
+pyo.plot(fig, filename='xyz.html')
