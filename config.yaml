@@ -29,7 +29,7 @@ config:
   int-out      : _out/int-out.xlsx
   dev-cmp      : _out/dev-compare.xlsx
   sig_file     : ‏‏סבב חתימות 7.10.20.xlsx
-  gantt_bl     : L:\projects\history\data\baseline\g_data_x.xlsx
+  gantt_bl     : ./data/history/data/g_data_x.xlsx
   ms_path      : C:\Program Files\Microsoft Office\root\Office16
   p3-robot     : bp3.py
   p3-skeleton  : bp3-skeleton.py
@@ -54,7 +54,7 @@ history:
   p3BI         : BI\p3-BI.xlsx
   pmo          : rules_DB.xlsx
   gantt        : g_data_x.xlsx
-  gantt_bl     : L:\projects\history\data\baseline\g_data_x.xlsx
+  gantt_bl     : ./data/history/data/g_data_x.xlsx
   moria        : moria.xlsx
   moria_out    : moria_out.xlsx
   sm_path      : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\מלאי

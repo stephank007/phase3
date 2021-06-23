@@ -3,6 +3,7 @@ import codecs
 import time
 import yaml
 import pandas as pd
+import json
 
 import plotly.express as px
 import plotly.offline as pyo
@@ -73,12 +74,18 @@ app = dash.Dash(
 body = dbc.Container([
     html.Hr(),
     dbc.Row([
-        dbc.Col(),
         dbc.Col(dcc.Graph(figure=fig, id='gantt-chart'), width={'size': 10}),
+    ]),
+    dbc.Row([
         dbc.Col(
-            dbc.Card(id="my_card", children=[
-                dbc.CardBody(id='click-data')
-            ], color='secondary', inverse=False), width={'size': 5, 'offset': 0}
+            html.Pre(
+                id='structure',
+                style={
+                    'border': 'thin lightgrey solid',
+                    'overflowY': 'scroll',
+                    'height': '275px'
+                }
+            )
         )
     ]),
     html.Hr(),
@@ -87,26 +94,10 @@ body = dbc.Container([
 app.layout = html.Div([body])
 
 @app.callback(
-    Output('click-data', 'children'),
-    Input('gantt-chart', 'clickData'))
-def display_hover_data(clickData):
-    t1 = None
-    if clickData is not None:
-        t1 = clickData.get('points')[0]
-        t1 = t1.get('customdata')
-        p_id = t1[0]
-        step = t1[1]
-        print(p_id, step)
-        dff = df_bi[( df_bi['process_id'] == p_id ) & ( df_bi['m_task'] == step )]
-        print(dff.shape)
-    if t1 is not None:
-        new_card_content = [dbc.ListGroupItem(x, style={'textAlign': 'right'}) for x in t1]
-        new_card_body = [html.H4("רשימת פגישות", className="card-title", style={'textAlign': 'center'})] + new_card_content
-    else:
-        new_card_content = [dbc.ListGroupItem('טרם עברתם על הנקודות שבגרף...', style={'textAlign': 'right'})]
-        new_card_body = [html.H4("רשימת פגישות", className="card-title", style={'textAlign': 'center'})] + new_card_content
-
-    return new_card_body
+    Output('structure', 'children'),
+    Input('gantt-chart', 'figure'))
+def display_hover_data(fig_json):
+    return json.dumps(fig_json, indent=2)
 
 if __name__ == '__main__':
     app.run_server(debug=True)

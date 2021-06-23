@@ -5,6 +5,7 @@ import numpy as np
 import os
 import codecs
 import yaml
+import json
 
 print(os.getcwd())
 with codecs.open('./config.yaml', 'r', encoding='utf-8') as f:
@@ -58,6 +59,11 @@ x1_rect = df_g['month'].max()
 x0_vrect = df_g[df_g['month'] == x0_rect]['cumsum'].values[0]
 x1_vrect = df_g[df_g['month'] == x1_rect]['cumsum'].values[0] + df_g[df_g['month'] == x1_rect]['width'].values[0]
 
+bl_start = df_g.loc[df_g.index.min(), 'cumsum']
+bl_end   = x1_vrect
+
+baseline_x = [bl_start, bl_end]
+baseline_y = [10, 10]
 
 fig = go.Figure()
 for key in data:
@@ -92,9 +98,33 @@ fig.update_xaxes(
 
 fig.add_vrect(
     x0=x0_vrect, x1=x1_vrect,
-    fillcolor="LightSalmon", opacity=0.8,
+    fillcolor="LightSalmon", opacity=0.5,
     layer="above", line_width=0,
 ),
+fig.add_trace(go.Scatter(
+    x=df_g['cumsum'],
+    y=[50 for i in range(len(df_g))],
+    mode='markers',
+    marker=dict(
+        size=12,
+        symbol='square',
+        color='white'
+    ),
+    showlegend=False
+))
+
+fig.add_trace(go.Scatter(
+    x=baseline_x,
+    y=baseline_y,
+    mode='lines',
+    name='baseline',
+    line=dict(
+        color='firebrick',
+        width=4,
+    ),
+    opacity=0.3
+    #   showlegend=True
+))
 
 fig.update_xaxes(range=[0, 100])
 fig.update_yaxes(range=[0, 100])
@@ -115,4 +145,5 @@ fig.update_layout(
     xaxis_tickangle=-45,
     height=600
 )
+
 pyo.plot(fig, filename=fo)

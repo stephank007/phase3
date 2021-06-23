@@ -5,6 +5,7 @@ import yaml
 import pandas as pd
 import plotly.express as px
 import plotly.offline as pyo
+import plotly.graph_objects as go
 import workday as wd
 
 start_s = time.time()
@@ -49,7 +50,7 @@ else:
     f1 = os.path.join(path,  config['config'].get('name'))
     fo = os.path.join(path,  config['config'].get('gantt'))
     lt = os.path.join(path,  config['config'].get('letters'))
-    hs = os.path.join(path,  config['history'].get('gantt_bl'))
+    hs = os.path.join(config['history'].get('gantt_bl'))
     cs = os.path.join(path,  config['config'].get('c_status'))
     f2 = os.path.join(path,  config['config'].get('name'))
 
@@ -309,11 +310,25 @@ point_shape.pop('yref')
 progress_line = config['progress_line']
 history_line  = config['history_line']
 for i, x in enumerate(df_x['process_id']):
-    progress_line['x0'] = df_x.Start_Date[i]
-    progress_line['x1'] = df_x.Steps_Completed[i]
-    progress_line['y0'] = df_x.process_id[i]
-    progress_line['y1'] = df_x.process_id[i]
-    fig.add_shape(progress_line)
+    xz = [df_x.Start_Date[i], df_x.Steps_Completed[i]]
+    yz = [df_x.process_id[i], df_x.process_id[i]]
+    # progress_line['x0'] = df_x.Start_Date[i]
+    # progress_line['x1'] = df_x.Steps_Completed[i]
+    # progress_line['y0'] = df_x.process_id[i]
+    # progress_line['y1'] = df_x.process_id[i]
+
+    fig.add_trace(go.Scatter(
+        x=xz,
+        y=yz,
+        mode='lines',
+        # name='progress',
+        line=dict(
+            color='firebrick',
+            width=4
+        ),
+        showlegend=False
+    ))
+    # fig.add_shape(progress_line)
     history_line['x0'] = df_x.Start_Date[i]
     try:
         history_line['x1'] = df_gantt_history.Finish_Date[i]
@@ -361,7 +376,7 @@ fig.add_annotation(g_today)
 
 fig.update_xaxes(title_font_family='Arial')
 fig.update_yaxes(autorange="reversed")
-fig.update_layout(xaxis_range=[x_start,
+fig.update_layout(showlegend=True, xaxis_range=[x_start,
                                pd.to_datetime('2021/01/31', format='%Y/%m/%d')])
 
 fn = os.path.join(config['config'].get('web'), 'bp_plan.html')
