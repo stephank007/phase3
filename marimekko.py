@@ -65,6 +65,7 @@ bl_end   = x1_vrect
 baseline_x = [bl_start, bl_end]
 baseline_y = [10, 10]
 
+annotations = []
 fig = go.Figure()
 for key in data:
     fig.add_trace(go.Bar(
@@ -119,12 +120,21 @@ fig.add_trace(go.Scatter(
     mode='lines',
     name='baseline',
     line=dict(
-        color='firebrick',
+        color='yellow',
         width=4,
     ),
     opacity=0.3
     #   showlegend=True
 ))
+annotations.append(dict(xref='paper', x=0.05, y=baseline_y[0],
+                        xanchor='left', yanchor='bottom',
+                        text='{}'.format('baseline'),
+                        font=dict(
+                            family='Arial',
+                            size=16,
+                            color='yellow'
+                        ),
+                        showarrow=False))
 
 fig.update_xaxes(range=[0, 100])
 fig.update_yaxes(range=[0, 100])
@@ -143,7 +153,8 @@ fig.update_layout(
     uniformtext=dict(mode="hide", minsize=10),
     xaxis={'categoryorder': 'category ascending'},
     xaxis_tickangle=-45,
-    height=600
+    height=600,
+    annotations=annotations
 )
 
 pyo.plot(fig, filename=fo)
