@@ -11,5 +11,5 @@ with codecs.open('config.yaml', 'r', encoding='utf-8') as f:
     config = yaml.safe_load(f)
 
 db = ms.mongo_connect()
-collection = ms.get_collection(db, 'requirements')
+collection = ms.get_collection(db, 'risk')
 ms.print_history_index(collection)

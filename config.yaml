@@ -5,19 +5,19 @@ execution_params:
   baseline: yes
 
 config:
-  #path         : \\hratalvfs\PublicMate\\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\מדורים\מדור פרוייקטים ומרה''ס\תיקיות אישיות\איתן כץ\projects\data
-  #web          : \\hratalvfs\PublicMate\\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\מדורים\מדור פרוייקטים ומרה''ס\תיקיות אישיות\איתן כץ\projects\data\web
-  path         : ./data/
-  web          : ./data/web/
   bin_path     : .
-  requirements : _in/requirements.xlsx
-  shortlist    : _in/requirements-shortlist.xlsx
   assets       : ./assets
-  risk_map     : _in/risktable.xlsx
+  path         : ./assets/data/
+  baseline     : ./assets/baseline/
+  web          : ./data/web/
   name         : _in/phase3-bp.xlsx
+  requirements : _in/requirements.xlsx
+  shortlist    : _in/rrquirements-shortlist.xlsx
+  n_shortlist  : _in/shortlist.xlsx
   moria        : _in/moria.xlsm
-  rule         : _in/rules_DB.xlsx
   pmo          : _in/rules_DB.xlsx
+  mrs          : _in/mrs-gantt.xlsx
+  risk_table   : _in/risk_management.xlsx
   out          : _out/p3-out.xlsx
   skeleton     : _out/p3-skeleton.xlsx
   p3BI         : _out/p3-BI.xlsx
@@ -28,18 +28,21 @@ config:
   c_status     : _out/current_status.xlsx
   int-out      : _out/int-out.xlsx
   dev-cmp      : _out/dev-compare.xlsx
+  in-out       : _out/dev-io.xlsx
+  risk-out     : _out/risk_out.xlsx
+  risk-s-out   : _out/risk_stacked_out.xlsx
   sig_file     : ‏‏סבב חתימות 7.10.20.xlsx
-  gantt_bl     : ./data/history/data/g_data_x.xlsx
+  gantt_bl     : L:\projects\history\data\baseline\g_data_x.xlsx
   ms_path      : C:\Program Files\Microsoft Office\root\Office16
+  pdr-meeting  : ../pdr-app/assets/data/_out/pdr_meeting_out.xlsx
   p3-robot     : bp3.py
-  p3-skeleton  : bp3-skeleton.py
+  p3-skeleton  : bp3-pre.py
   consolidated : _out\p3-consolidated.xlsx
+  transfer     : ./data/_in/transfer
   sc_path      : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\מלאי
   # requirements : \\hmlotemvfs\mzpn181\PublicMzpn181\Logmar\מרהס\מרהס שלב ג\ספריית שיתוף אמלח\דרישות ממערכת SAP הצהלית וממערכת WMS הזכיין.xlsx
   tasks        : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\מלאי\מרהס שלב ג - קובץ משימות.xlsx
-  transfer     : _in/transfer
   install      : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\מדורים\מדור פרוייקטים ומרה''ס\תיקיות אישיות\איתן כץ\install
-  risk         : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\ג-סיכונים\risk management.xlsx
 
 history:
   date         : '2021-01-01'
@@ -54,7 +57,7 @@ history:
   p3BI         : BI\p3-BI.xlsx
   pmo          : rules_DB.xlsx
   gantt        : g_data_x.xlsx
-  gantt_bl     : ./data/history/data/g_data_x.xlsx
+  gantt_bl     : L:\projects\history\data\baseline\g_data_x.xlsx
   moria        : moria.xlsx
   moria_out    : moria_out.xlsx
   sm_path      : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\מלאי
@@ -91,16 +94,26 @@ program_status_map:
     7 - חתום           : חתום
 
 project_milestones:
-  PDR    : חתום
-  C-IMP  : משימת תשתית עלתה לאויר
-  C-SAP  : משימת סאפ עלתה לאויר
-  C-INT  : משימת ממשק עלתה לאויר
+  BP   : אישור שגיב שרביט
+  SAP  : משימת סאפ עלתה לאויר
+  INT  : משימת ממשק עלתה לאויר
+
+m4n-ms:
+  PDR:
+    - 00.50.27
+  CDR:
+    - 00.50.33
 
 contract_ms:
-  מוכנות למפגש עם הזכיין : סיום ואישור מסמכי בלו-פרינט
-
+  Integration:
+    - SAP
+    - INT
 MTA:
-  סיום ואישור מסמכי בלו-פרינט: PDR
+  - BP
+  - SRR
+  - PDR
+  - CDR
+  - Integration
 
 mom_status_map: {
   טרם החל      : not started,
@@ -134,6 +147,7 @@ step:
 constraint_type:
     MFO: "Must Finish On"
     MSO: "Must Start On"
+    ASAP: "As Soon As Possible"
 
 holidays:
   - 20200920
@@ -144,6 +158,13 @@ holidays:
   - 20201006
   - 20201007
   - 20201008
+  - 20210516
+  - 20210517
+  - 20210523
+  - 20210524
+  - 20210525
+  - 20210526
+  - 20210527
 
 bdays:
   holidays   : ['20200920','20200927','20200928','20201004','20201005','20201006','20201007','20201008']
@@ -282,15 +303,15 @@ step_ordered: {
 gantt_today: {
      xanchor: 'right',
      bordercolor: '#3366CC',
-     ax: -125,
-     y: 0,
+     ax: 175,
+     y: 5,
      showarrow: True,
      bgcolor: 'white',
      arrowcolor: 'green',
      arrowhead: 1,
      arrowsize: 1,
      arrowwidth: 2,
-     opacity: 0.7,
+     opacity: 0.9,
      font: {color: '#264E86',
             family: 'sans serif',
             size: 18}
@@ -328,10 +349,10 @@ progress_line: {
 history_line: {
   type: line,
   line: {
-    color: '#192ecf',
+    color: '#61b4e8',
     width: 4.0
   },
-  opacity: 0.5
+  opacity: 0.6
 }
 
 measure_text:
@@ -388,6 +409,7 @@ process_ref_columns:
   - t_shirt
 
 skeleton_columns:
+  - Task Mode
   - RN
   - xRN
   - row_type
@@ -398,13 +420,14 @@ skeleton_columns:
   - waiting
   - status
   - BP
+  - '% Complete'
   - due_date
   - parent
   - rule
   - Deadline
   - task_notes
   - task_notes_2
-  - function_requirement_reference
+  # - function_requirement_reference
   - sub_process
   - source
   - Outline Level
@@ -418,8 +441,12 @@ skeleton_columns:
   - d-finish
   - d-pc
   - lc-RN
+  - d-duration
+  - domain
+  - process
 
 consolidated_columns:
+  - Task Mode
   - RN
   - xRN
   - row_type
@@ -429,13 +456,14 @@ consolidated_columns:
   - p_owner
   - waiting
   - status
+  - '% Complete'
   - due_date
   - parent
   - rule
   - Deadline
   - task_notes
   - task_notes_2
-  - function_requirement_reference
+  # - function_requirement_reference
   - sub_process
   - source
   - Outline Level
@@ -457,9 +485,11 @@ dfP:
   p_owner : Text7
   source  : Text8
   rule    : Text9
+  alias   : Text10
   isMS    : Milestone
 
 dfP_columns:
+#  - Task Mode
   - Outline Level
   - Start
   - Finish
@@ -471,15 +501,17 @@ dfP_columns:
   - Work
   - Milestone
   - Predecessors
+# - Successors
+  - Text10
+  - Text8
   - Text1
+  - Text5
   - Text2
   - Text3
-  - Text4
-  - Text5
   - Text6
   - Text7
-  - Text8
   - Text9
+  - Text4
   - Name
   - Deadline
 #  - Resource Names
@@ -509,7 +541,8 @@ realization_columns_map: {
   הערות                            : task_notes,
   הערות אמל"ח                      : task_notes_2,
   תרחיש                            : domain_id,
-  תהליך                            : process_id
+  תהליך                            : process_id,
+  'הערות קפטי"ה'                   : logmar_notes
 }
 
 s_rule_map: {
@@ -526,7 +559,7 @@ s_rule_map: {
   TMS            :  TMS,
   'ממשקים: SAP  - תומר' : INT,
   SAP -> WMS     : SAP,
-  WMS/TMS        : WMS
+  WMS/TMS        : WMS,
 }
 
 realization_columns:
@@ -550,7 +583,23 @@ realization_columns:
   - d-start
   - d-finish
   - d-pc
+  - d-duration
   - lc-RN
+
+df_bi_columns:
+  - RN
+  - xRN
+  - domain_id
+  - process_id
+  - parent
+  - Start_Date
+  - Finish_Date
+  - row_type
+  - m_task
+  - publish
+  - month
+  - pc
+  - Name
 
 tasks_status_map: {
   בוטל     : בוטל,
@@ -570,4 +619,35 @@ tasks_columns_map: {
   הערות    : task_notes,
   תרחיש    : domain_id,
   תהליך    : process_id
+}
+
+mrs-table:
+   - ID
+   - Unique_ID
+   - שם_פעילות
+   - Deadline
+   - Percent_Complete
+   - Deadline
+   - Start_Date
+   - Finish_Date
+   - Predecessors
+   - WBS
+style_cell : {
+  'overflow'       : 'hidden',
+  'textOverflow'   : 'ellipsis',
+  'whiteSpace'     : 'normal',
+  'maxWidth'       : 0,
+  'padding'        : '3px',
+  'border'         : '1px solid blue',
+  'backgroundColor': 'rgb(230, 235, 223)',
+  'textAlign'      : 'center',
+  'font_size'      : '12px',
+}
+
+style_header : {
+  'backgroundColor': 'rgb(230, 230, 230)',
+  'border'         : '1px solid pink',
+  'textAlign'      : 'center',
+  'fontWeight'     : 'bold',
+  'font_size'      : '14px',
 }

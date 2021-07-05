@@ -1,50 +1,34 @@
 import os
 import codecs
-import time
-import yaml
 import pandas as pd
-import plotly.express as px
-import plotly.offline as pyo
-import plotly.graph_objects as go
+import warnings as warning
+import yaml
+import mongo_services as ms
 
-import numpy as np
-np.random.seed(1)
+pd.options.mode.chained_assignment = 'raise'  # pd.options.mode.chained_assignment = None
+warning.filterwarnings('ignore')
+with codecs.open('config.yaml', 'r', encoding='utf-8') as f:
+    config = yaml.safe_load(f)
 
-# Generate data
-x0 = np.random.normal(2, 0.45, 300)
-y0 = np.random.normal(2, 0.45, 300)
+path = config['config'].get('path')
+pmo  = os.path.join(path, config['config'].get('dev-cmp'))
 
-x1 = np.random.normal(6, 0.4, 200)
-y1 = np.random.normal(6, 0.4, 200)
+db = ms.mongo_connect()
+writer = pd.ExcelWriter(pmo, engine='xlsxwriter')
+dt = '2020-05-04'
 
-# Create figure
-fig = go.Figure()
+for sheet in ['Requirements']:
+    collection = ms.get_collection(db, sheet)
+    updateResult = collection.update_many(
+        {'index': dt + ':x1'},
+        {
+            '$set': {'index': dt}
+        }
+    )
+    df = ms.retrieve_history(collection, dt)
+    print(df.shape)
 
-# Add scatter traces
-fig.add_trace(go.Scatter(x=x0, y=y0, mode="markers"))
-fig.add_trace(go.Scatter(x=x1, y=y1, mode="markers"))
-
-# Add shapes
-fig.add_shape(type="circle",
-    xref="x", yref="y",
-    x0=min(x0), y0=min(y0),
-    x1=max(x0), y1=max(y0),
-    opacity=0.2,
-    fillcolor="blue",
-    line_color="blue",
-)
-
-fig.add_shape(type="circle",
-    xref="x", yref="y",
-    x0=min(x1), y0=min(y1),
-    x1=max(x1), y1=max(y1),
-    opacity=0.2,
-    fillcolor="orange",
-    line_color="orange",
-)
-
-
-# Hide legend
-fig.update_layout(showlegend=True)
-
-pyo.plot(fig, filename='xyz.html')
+quit(0)
+workbook = writer.book
+df.to_excel(writer, sheet_name=sheet)
+writer.save()

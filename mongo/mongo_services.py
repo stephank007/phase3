@@ -41,7 +41,7 @@ def print_history_index(requirements):
 def mongo_connect():
     try:
         client = MongoClient(port=27017)  # client = MongoClient('mongodb://localhost:27017/')
-        db = client['Phase3']
+        db = client['P3']
     except Exception as e:
         print("Failed to connect to mongoDB: ", e)
 

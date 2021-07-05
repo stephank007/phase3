@@ -1,4 +1,3 @@
-# This Python file uses the following encoding: utf-8
 import os
 import codecs
 import pandas as pd
@@ -6,9 +5,9 @@ import numpy as np
 import yaml
 import time
 import re
+import workday as wd
 
 def prepare_domain():
-    df_domain_reference = pd.read_excel(f2, sheet_name='domain_ref')
     df_dm = pd.DataFrame()
     df = df_domain_reference[['RN', 'domain_id']].dropna()
     df_map = df.copy()
@@ -117,33 +116,53 @@ def insert_realization_requirements():
 
     """ 
         df_dev is the full list of requirements --> it's RN is an old RN which is not mapped properly to its rule
-        df_shortlist is had been decided as the shortlist for development
+        df_shortlist is what had been decided as the shortlist for development
     """
     df_dev = pd.read_excel(f1, sheet_name='דרישות')
     df_dev.rename(columns=config['realization_columns_map'], inplace=True)
-    df_dev['in-dev'] = df_dev.RN.map(in_dev_map.get('Task Name'))
-    df_dev['in-dev'] = df_dev['in-dev'].apply(lambda x: True if isinstance(x, str) else False)
-    df_dev['r-start'] = df_dev.RN
+    df_dev['in-dev']  = df_dev.RN.map(in_dev_map.get('Task Name'))
+    df_dev['in-dev']  = df_dev['in-dev'].apply(lambda x: True if isinstance(x, str) else False)
     """ select realization eligible rows """
     df_dev = df_dev[df_dev['in-dev']]
-    df_dev['d-start']  = df_dev.RN.map(in_dev_map.get('Start'))
-    df_dev['d-finish'] = df_dev.RN.map(in_dev_map.get('Finish'))
-    df_dev['d-pc']     = df_dev.RN.map(in_dev_map.get('% Complete'))
+    df_dev['d-start']     = df_dev.RN.map(in_dev_map.get('Start'))
+    df_dev['d-finish']    = df_dev.RN.map(in_dev_map.get('Finish'))
+    df_dev['d-pc']        = df_dev.RN.map(in_dev_map.get('% Complete'))
+    df_dev['d-duration']  = df_dev.RN.map(in_dev_map.get('Duration'))
+    df_dev['d-duration']  = df_dev['d-duration'].apply(lambda x: x.split(' ')[0])
+    df_dev['d-duration']  = df_dev['d-duration'].astype(float)
 
     pmo_p = df_dev.columns[8]
-    df_dev.rename(columns={pmo_p: 'pmo_priority', 'RN': 'xRN'}, inplace=True)
+    df_dev.rename(columns={
+        pmo_p  : 'pmo_priority',
+        'RN'   : 'xRN'
+    }, inplace=True)
     df_dev['s_rule'] = df_dev['s_rule'].str.strip()
 
-    df_dev['rule'] = df_dev['s_rule'].map(config.get('s_rule_map'))
-    df_dev = df_dev[df_dev['rule'] != 'ignore']
-    df_dev = df_dev[df_dev['s_rule'].notnull()]
+    """ map rule as per domain_ref--> logmar_rule"""
+    s_rule_map = df_domain_reference[['logmar_rule', 'rule']]
+    s_rule_map = s_rule_map[s_rule_map['logmar_rule'].notnull()]
+    s_rule_map.set_index('logmar_rule', inplace=True)
+    s_rule_map = s_rule_map.to_dict()
+    df_dev['rule'] = df_dev['s_rule'].map(s_rule_map.get('rule'))
+    # df_dev['rule'] = df_dev['s_rule'].map(config.get('s_rule_map'))
+    # df_dev = df_dev[df_dev['rule'] != 'ignore']
+    # df_dev = df_dev[df_dev['s_rule'].notnull()]
+    """ logmar rule map complete"""
+
+    """ !!!!! Not is use !!!!! -- map logmar notes to to ignore/open open: is an issue open to product manager """
+    logmar_notes_map = df_domain_reference[['logmar_notes', 'rule']]
+    logmar_notes_map.set_index('logmar_notes', inplace=True)
+    logmar_notes_map = logmar_notes_map.to_dict()
+    df_dev['logmar_rule'] = df_dev.logmar_notes.map(logmar_notes_map.get('rule'))
+    """ logmar notes complete"""
+
     df_dev['process'] = df_dev['process_id'].apply(lambda x1: x1.split(':')[0])
     df_dev['domain']  = df_dev['domain_id'].apply(lambda x1: x1.split(':')[0])
 
     df_dev.sort_values(by=['domain', 'process', 'rule'], inplace=True)
     df_dev.reset_index(inplace=True)
 
-    """ apply real RN as per the assigned rule ignoring realization file RN however keeping it as xRN """
+    """ apply real RN as per the assigned rule ignoring realization file RN while keeping it as xRN """
     for process in df_dev['process_id'].unique():
         df_p = df_dev[df_dev['process_id'] == process]
         for rule in df_p['rule'].unique():
@@ -166,11 +185,19 @@ def insert_realization_requirements():
     df_dev['lc-RN']    = df_dev['RN'] + '.02.03'
     df_dev['parent']   = df_dev.get('RN')
     df_dev['row_type'] = 'parent'
-    df_dev['due_date'] = pd.to_datetime('28/02/2020', format='%d/%m/%Y')
+    df_dev['due_date'] = df_dev['d-finish'].apply(
+        lambda x: wd.workday(
+            pd.to_datetime(x, format='%d/%m/%Y'),
+            days=10,
+            holidays=holidays,
+            weekends=weekends
+        )
+    )
+    df_dev['d-finish'] = df_dev['due_date']
     df_dev['t_shirt']  = 'M'
     df_dev['source']   = 'requirements'
     df_dev['waiting']  = None
-
+#     """ This chapter is adding the GEN tasks from the task file """
 #     df_tsk = pd.read_excel(f3, sheet_name='משימות')
 #     df_tsk.rename(columns=config['tasks_columns_map'], inplace=True)
 #     df_tsk['status'] = df_tsk.status.map(config['tasks_status_map'])
@@ -184,8 +211,9 @@ def insert_realization_requirements():
 #     df_tsk['rule']     = 'GEN'
 #
 #     df_dev = pd.concat([df_dev, df_tsk], ignore_index=True)
-    df_dev = df_dev[config.get('realization_columns')]
+#     df_dev = df_dev[config.get('realization_columns')]
 
+    """ filter only what is in development """
     df_dev = df_dev[df_dev['RN'].notnull()]
 
     return df_dev
@@ -207,9 +235,61 @@ def assign_fields_from_RN(df=pd.DataFrame()):
     return df
 
 def insert_project_header():
-    dfx = pd.read_excel(fr, sheet_name='header')
-    dfx['p_rule'] = None
-    return dfx
+    df_dl     = pd.read_excel(f5, sheet_name='dl')
+    m4n_mm    = pd.read_excel(f5, sheet_name='m4n-mm')
+    df_mrs    = pd.read_excel(f6, sheet_name='Task_Table1')
+    df_header = pd.read_excel(fr, sheet_name='header')
+    df_header['row_type'] = 'header'
+    df_dl = df_dl.fillna('')
+
+    mrs_uids = df_header['source'].to_list()
+    mrs_uids = [int(x) for x in mrs_uids if np.isnan(x) == False]
+    mask = df_mrs['Unique_ID'].isin(mrs_uids)
+    df_mrs = df_mrs[mask]
+    df_mrs['Start']  = pd.to_datetime(df_mrs['Start_Date'], format='%B %d, %Y %H:%M %p').dt.strftime('%d/%m/%Y')
+    df_mrs['Finish'] = pd.to_datetime(df_mrs['Finish_Date'], format='%B %d, %Y %H:%M %p').dt.strftime('%d/%m/%Y')
+    df_mrs = df_mrs[['Unique_ID', 'Start', 'Finish', 'Percent_Complete']]
+    df_mrs.set_index('Unique_ID', inplace=True)
+    mrs_map = df_mrs.to_dict()
+    df_header['due_date'] = df_header.source.map(mrs_map.get('Start'))
+    df_header[pc] = df_header.source.map(mrs_map.get('Percent_Complete'))
+
+    i = 0
+    for index, row in df_dl.iterrows():
+        i = i + 1
+        rn = '00.50.' + f'{i:0>2}'
+        df_dl.loc[index, 'RN']        = rn
+        df_dl.loc[index, 'Name']      = df_dl.loc[index, 'p_name'] + ' -- ' + df_dl.loc[index, 'task']
+        df_dl.loc[index, 'Deadline']  = df_dl.loc[index, 'dl_date'].strftime('%d/%m/%Y')
+        df_dl.loc[index, 'source']    = df_dl.loc[index, 'WBS']
+        df_dl.loc[index, 'alias']     = df_dl.loc[index, 'WBS']
+        df_dl.loc[index, OL]          = 3
+        df_dl.loc[index, 'due_date']  = df_dl.loc[index, 'dl_date']
+        df_dl.loc[index, 'isMS']      = 1
+        df_dl.loc[index, 'row_type']  = 'm4n-dl'
+
+    """ mark M4N Major Milestones and manage them separately """
+    i = 0
+    for index, row in m4n_mm.iterrows():
+        i += 1
+        rn = '00.40.' + f'{i:0>2}'
+
+        m4n_mm.loc[index, 'RN']       = rn
+        m4n_mm.loc[index, OL]         = 3
+        m4n_mm.loc[index, 'alias']    = row.task
+        m4n_mm.loc[index, 'Name']     = row.task
+        m4n_mm.loc[index, 'row_type'] = 'm4n-ms'
+        m4n_mm.loc[index, 'due_date'] = row.finish
+        m4n_mm.loc[index, 'Deadline'] = row.finish
+        m4n_mm.loc[index, 'isMS']     = 1
+        m4n_mm.loc[index, 'source']   = row.WBS
+
+    m4n_mm['Task Mode'] = 'Manually Scheduled'
+    m4n_mm = m4n_mm[['Outline Level', 'RN', 'Name', 'row_type', 'Deadline', 'due_date', 'isMS', 'source', 'alias']]
+    df_dl  = df_dl[['Outline Level', 'RN', 'Name', 'row_type', 'Deadline', 'due_date', 'isMS', 'source', 'alias']]
+    df_header = pd.concat([df_header, df_dl, m4n_mm], ignore_index=True)
+
+    return df_header
 
 def insert_sub_groups(df=pd.DataFrame()):  # insert sub groups
     parent_list = df['parent'].unique()
@@ -313,12 +393,18 @@ def check_status(df=pd.DataFrame()):
 
 if __name__ == '__main__':
     print(125 * '=')
+    pc = '% Complete'
+    OL = 'Outline Level'
+
     pd.options.mode.chained_assignment = 'raise'
     start_a = time.time()
 
     with codecs.open('config.yaml', 'r', encoding='utf-8') as f:
         config = yaml.safe_load(f)
 
+    (MON, TUE, WED, THU, FRI, SAT, SUN) = range(7)
+    holidays = pd.to_datetime(config['holidays'])
+    weekends = (FRI, SAT)
     dt = config['history'].get('date')
     history = config['execution_params'].get('history')
     if history:
@@ -341,7 +427,10 @@ if __name__ == '__main__':
         f2 = os.path.join(path, config['config'].get('name'))
         f3 = os.path.join(path, config['config'].get('tasks'))
         f4 = os.path.join(path, config['config'].get('shortlist'))
+        f5 = config['config'].get('pdr-meeting')
+        f6 = os.path.join(path, config['config'].get('mrs'))
 
+    df_domain_reference = pd.read_excel(f2, sheet_name='domain_ref')
     df_rl = pd.read_excel(fr, sheet_name='Lines')
     df_rl['t_shirt_tuple'] = df_rl[df_rl.columns[7:12]].apply(tuple, axis=1)
 
@@ -351,13 +440,14 @@ if __name__ == '__main__':
     df_bp = pd.concat([df_b1, df_b2, insert_realization_requirements()], ignore_index=True, sort=False)
 
     # df_bp = assign_fields_from_RN(df=df_bp)
-    df_bp = pd.concat([df_bp, prepare_interface(), insert_project_header()], ignore_index=True, sort=False)
+    # df_bp = pd.concat([df_bp, prepare_interface(), insert_project_header()], ignore_index=True, sort=False)
+    df_bp = pd.concat([df_bp, insert_project_header()], ignore_index=True, sort=False)
     df_bp = insert_hd1_rows(df=df_bp)
 
     start = time.time()
     if history:
         df_bp['rule'] = df_bp['rule'].fillna(' ')
-        df_bp['rule'] = df_bp['rule'].apply(lambda x: 'is' + x if dt < '27/12/202' else x)
+        df_bp['rule'] = df_bp['rule'].apply(lambda x: 'is' + x if dt < '27/12/2021' else x)
 
     ''' rules handler '''
     start_z = time.time()
@@ -383,7 +473,7 @@ if __name__ == '__main__':
 
     df_bp = df_bp[config['skeleton_columns']]
     df_dv = df_bp[df_bp['lc-RN'].notnull()]
-    df_dv = df_dv[['lc-RN', 'd-start', 'd-finish', 'd-pc']]
+    df_dv = df_dv[['lc-RN', 'd-start', 'd-finish', 'd-pc', 'd-duration']]
 
     writer = pd.ExcelWriter(fs, engine='xlsxwriter')
     workbook = writer.book

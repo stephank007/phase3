@@ -16,10 +16,12 @@ print(125*'=')
 with codecs.open('config.yaml', 'r', encoding='utf-8') as f:
     config = yaml.safe_load(f)
 
-path = config['config'].get('burn')
+print(os.getcwd())
+path = '../../khalid'
 os.chdir(path)
+print(os.getcwd())
 
-for r, d, f in os.walk(path):
+for r, d, f in os.walk('.'):
     print(r, d)
     for file in f:
         if '.txt' in file:
