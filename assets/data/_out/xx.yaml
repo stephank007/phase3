@@ -1,0 +1,708 @@
+Finish_Date:
+  "01.01: \u05E7\u05D1\u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1661266800000000000
+  - null
+  - null
+  "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1667401200000000000
+  - null
+  - null
+  "01.03: \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1635256800000000000
+  - null
+  - null
+  "01.04: \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1628089200000000000
+  - null
+  - null
+  "01.05: \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1638280800000000000
+  - null
+  - null
+  "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1638712800000000000
+  - null
+  - null
+  "01.11: \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\u05D3\u05E0\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1640185200000000000
+  - null
+  - null
+  "01.12: \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1651590000000000000
+  - null
+  - null
+  "01.14: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1627916400000000000
+  - null
+  - null
+  "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1646665200000000000
+  - null
+  - null
+  "01.16: \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1649257200000000000
+  - null
+  - null
+  "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1650466800000000000
+  - null
+  - null
+  "01.18: \u05D1\u05D9\u05DE\"\u05DC\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1638457200000000000
+  - null
+  - null
+  "02.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\u05E9\u05E8\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1647183600000000000
+  - null
+  - null
+  "02.02: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1655305200000000000
+  - null
+  - null
+  "02.06: \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1637676000000000000
+  - null
+  - null
+  "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1646060400000000000
+  - null
+  - null
+  "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1637071200000000000
+  - null
+  - null
+  "02.12: \u05EA\u05D9\u05E7\u05D5\u05E0\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1648652400000000000
+  - null
+  - null
+  "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1651417200000000000
+  - null
+  - null
+  "02.18: \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1656860400000000000
+  - null
+  - null
+  '02.23: MRP': !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1637589600000000000
+  - null
+  - null
+  "02.24: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\u05D9\u05DF": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1637762400000000000
+  - null
+  - null
+  "04.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1626688800000000000
+  - null
+  - null
+  "06.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\u05DC\u05D5\u05D2": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1626350400000000000
+  - null
+  - null
+  "06.02: \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1626350400000000000
+  - null
+  - null
+  "06.03: \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1626350400000000000
+  - null
+  - null
+  "07.01: \u05D4\u05E4\u05E6\u05D4": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1610989200000000000
+  - null
+  - null
+  '10.04: BW': !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1629799200000000000
+  - null
+  - null
+RN:
+  "01.01: \u05E7\u05D1\u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9": 1.01
+  "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA": 1.02
+  "01.03: \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\u05DD": 1.03
+  "01.04: \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\u05DD": 1.04
+  "01.05: \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\u05DD": 1.05
+  "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4": 1.06
+  "01.11: \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\u05D3\u05E0\u05D9\u05DD": 1.11
+  "01.12: \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA": 1.12
+  "01.14: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9": 1.14
+  "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\u05DD": 1.15
+  "01.16: \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA": 1.16
+  "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA": 1.17
+  "01.18: \u05D1\u05D9\u05DE\"\u05DC\u05D9\u05DD": 1.18
+  "02.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\u05E9\u05E8\u05EA": 2.01
+  "02.02: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": 2.02
+  "02.06: \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": 2.06
+  "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\u05EA": 2.08
+  "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\u05EA": 2.11
+  "02.12: \u05EA\u05D9\u05E7\u05D5\u05E0\u05D9\u05DD": 2.12
+  "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\u05EA": 2.13
+  "02.18: \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD": 2.18
+  '02.23: MRP': 2.23
+  "02.24: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\u05D9\u05DF": 2.24
+  "04.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9": 4.01
+  "06.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\u05DC\u05D5\u05D2": 6.01
+  "06.02: \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF": 6.02
+  "06.03: \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2": 6.03
+  "07.01: \u05D4\u05E4\u05E6\u05D4": 7.01
+  '10.04: BW': 10.04
+Start_Date:
+  "01.01: \u05E7\u05D1\u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1596528000000000000
+  - null
+  - null
+  "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1592467200000000000
+  - null
+  - null
+  "01.03: \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1596700800000000000
+  - null
+  - null
+  "01.04: \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1597132800000000000
+  - null
+  - null
+  "01.05: \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1598774400000000000
+  - null
+  - null
+  "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1595232000000000000
+  - null
+  - null
+  "01.11: \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\u05D3\u05E0\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1597219200000000000
+  - null
+  - null
+  "01.12: \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1597219200000000000
+  - null
+  - null
+  "01.14: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1597564800000000000
+  - null
+  - null
+  "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1597651200000000000
+  - null
+  - null
+  "01.16: \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1596355200000000000
+  - null
+  - null
+  "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1597564800000000000
+  - null
+  - null
+  "01.18: \u05D1\u05D9\u05DE\"\u05DC\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1597910400000000000
+  - null
+  - null
+  "02.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\u05E9\u05E8\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1595318400000000000
+  - null
+  - null
+  "02.02: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1594022400000000000
+  - null
+  - null
+  "02.06: \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1594195200000000000
+  - null
+  - null
+  "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1595145600000000000
+  - null
+  - null
+  "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1594195200000000000
+  - null
+  - null
+  "02.12: \u05EA\u05D9\u05E7\u05D5\u05E0\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1594281600000000000
+  - null
+  - null
+  "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1594540800000000000
+  - null
+  - null
+  "02.18: \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1594540800000000000
+  - null
+  - null
+  '02.23: MRP': !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1595318400000000000
+  - null
+  - null
+  "02.24: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\u05D9\u05DF": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1595145600000000000
+  - null
+  - null
+  "04.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1594886400000000000
+  - null
+  - null
+  "06.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\u05DC\u05D5\u05D2": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1604476800000000000
+  - null
+  - null
+  "06.02: \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1596700800000000000
+  - null
+  - null
+  "06.03: \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1604476800000000000
+  - null
+  - null
+  "07.01: \u05D4\u05E4\u05E6\u05D4": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1604476800000000000
+  - null
+  - null
+  '10.04: BW': !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1596700800000000000
+  - null
+  - null
+'Unnamed: 0':
+  "01.01: \u05E7\u05D1\u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9": 94
+  "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA": 582
+  "01.03: \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\u05DD": 893
+  "01.04: \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\u05DD": 963
+  "01.05: \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\u05DD": 1007
+  "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4": 1296
+  "01.11: \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\u05D3\u05E0\u05D9\u05DD": 1510
+  "01.12: \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA": 1669
+  "01.14: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9": 1869
+  "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\u05DD": 1991
+  "01.16: \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA": 2114
+  "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA": 2337
+  "01.18: \u05D1\u05D9\u05DE\"\u05DC\u05D9\u05DD": 2559
+  "02.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\u05E9\u05E8\u05EA": 2760
+  "02.02: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": 2796
+  "02.06: \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": 3146
+  "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\u05EA": 3247
+  "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\u05EA": 3429
+  "02.12: \u05EA\u05D9\u05E7\u05D5\u05E0\u05D9\u05DD": 3533
+  "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\u05EA": 3723
+  "02.18: \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD": 3846
+  '02.23: MRP': 4026
+  "02.24: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\u05D9\u05DF": 4072
+  "04.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9": 4168
+  "06.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\u05DC\u05D5\u05D2": 4206
+  "06.02: \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF": 4228
+  "06.03: \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2": 4250
+  "07.01: \u05D4\u05E4\u05E6\u05D4": 4273
+  '10.04: BW': 4338
+bl-finish:
+  "01.01: \u05E7\u05D1\u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1655395200000000000
+  - null
+  - null
+  "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1666710000000000000
+  - null
+  - null
+  "01.03: \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1629039600000000000
+  - null
+  - null
+  "01.04: \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1627574400000000000
+  - null
+  - null
+  "01.05: \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1610557200000000000
+  - null
+  - null
+  "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1638280800000000000
+  - null
+  - null
+  "01.11: \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\u05D3\u05E0\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1663686000000000000
+  - null
+  - null
+  "01.12: \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1633010400000000000
+  - null
+  - null
+  "01.14: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1626883200000000000
+  - null
+  - null
+  "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1642518000000000000
+  - null
+  - null
+  "01.16: \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1649602800000000000
+  - null
+  - null
+  "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1645974000000000000
+  - null
+  - null
+  "01.18: \u05D1\u05D9\u05DE\"\u05DC\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1646578800000000000
+  - null
+  - null
+  "02.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\u05E9\u05E8\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1614531600000000000
+  - null
+  - null
+  "02.02: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1658419200000000000
+  - null
+  - null
+  "02.06: \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1636380000000000000
+  - null
+  - null
+  "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1644850800000000000
+  - null
+  - null
+  "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1634220000000000000
+  - null
+  - null
+  "02.12: \u05EA\u05D9\u05E7\u05D5\u05E0\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1652713200000000000
+  - null
+  - null
+  "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1635775200000000000
+  - null
+  - null
+  "02.18: \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1650207600000000000
+  - null
+  - null
+  '02.23: MRP': !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1633528800000000000
+  - null
+  - null
+  "02.24: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\u05D9\u05DF": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1636552800000000000
+  - null
+  - null
+  "04.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1626688800000000000
+  - null
+  - null
+  "06.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\u05DC\u05D5\u05D2": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1626350400000000000
+  - null
+  - null
+  "06.02: \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1626350400000000000
+  - null
+  - null
+  "06.03: \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1626350400000000000
+  - null
+  - null
+  "07.01: \u05D4\u05E4\u05E6\u05D4": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1610989200000000000
+  - null
+  - null
+  '10.04: BW': !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1629799200000000000
+  - null
+  - null
+c_date:
+  "01.01: \u05E7\u05D1\u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1612252800000000000
+  - null
+  - null
+  "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1612944000000000000
+  - null
+  - null
+  "01.03: \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1615363200000000000
+  - null
+  - null
+  "01.04: \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1617091200000000000
+  - null
+  - null
+  "01.05: \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1609401600000000000
+  - null
+  - null
+  "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1608710400000000000
+  - null
+  - null
+  "01.11: \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\u05D3\u05E0\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1610524800000000000
+  - null
+  - null
+  "01.12: \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1614844800000000000
+  - null
+  - null
+  "01.14: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1611475200000000000
+  - null
+  - null
+  "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1614499200000000000
+  - null
+  - null
+  "01.16: \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1611043200000000000
+  - null
+  - null
+  "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1611648000000000000
+  - null
+  - null
+  "01.18: \u05D1\u05D9\u05DE\"\u05DC\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1610524800000000000
+  - null
+  - null
+  "02.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\u05E9\u05E8\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1632038400000000000
+  - null
+  - null
+  "02.02: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1611129600000000000
+  - null
+  - null
+  "02.06: \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1609833600000000000
+  - null
+  - null
+  "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1610265600000000000
+  - null
+  - null
+  "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1609920000000000000
+  - null
+  - null
+  "02.12: \u05EA\u05D9\u05E7\u05D5\u05E0\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1609401600000000000
+  - null
+  - null
+  "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\u05EA": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1614672000000000000
+  - null
+  - null
+  "02.18: \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1612425600000000000
+  - null
+  - null
+  '02.23: MRP': !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1617609600000000000
+  - null
+  - null
+  "02.24: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\u05D9\u05DF": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1611561600000000000
+  - null
+  - null
+  "04.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1619337600000000000
+  - null
+  - null
+  "06.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\u05DC\u05D5\u05D2": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1621497600000000000
+  - null
+  - null
+  "06.02: \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1618905600000000000
+  - null
+  - null
+  "06.03: \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1621324800000000000
+  - null
+  - null
+  "07.01: \u05D4\u05E4\u05E6\u05D4": !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1611129600000000000
+  - null
+  - null
+  '10.04: BW': !!python/object/apply:pandas._libs.tslibs.timestamps.Timestamp
+  - 1598515200000000000
+  - null
+  - null
+c_days:
+  "01.01: \u05E7\u05D1\u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9": 130.0625
+  "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA": 169.7864
+  "01.03: \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\u05DD": 154.83
+  "01.04: \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\u05DD": 165.0746
+  "01.05: \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\u05DD": 89.02999999999999
+  "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4": 112.1175
+  "01.11: \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\u05D3\u05E0\u05D9\u05DD": 110.7975
+  "01.12: \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA": 146.9242
+  "01.14: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9": 115.8624
+  "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\u05DD": 139.32
+  "01.16: \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA": 122.0552
+  "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA": 117.8464
+  "01.18: \u05D1\u05D9\u05DE\"\u05DC\u05D9\u05DD": 104.0325
+  "02.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\u05E9\u05E8\u05EA": 303.8662
+  "02.02: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": 142.535
+  "02.06: \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": 129.105
+  "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\u05EA": 125.085
+  "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\u05EA": 130.5057
+  "02.12: \u05EA\u05D9\u05E7\u05D5\u05E0\u05D9\u05DD": 125.3177
+  "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\u05EA": 167.8875
+  "02.18: \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD": 149.964
+  '02.23: MRP': 184.52
+  "02.24: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\u05D9\u05DF": 136.7883
+  "04.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9": 201.704
+  "06.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\u05DC\u05D5\u05D2": 141.2125
+  "06.02: \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF": 183.2064
+  "06.03: \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2": 139.425
+  "07.01: \u05D4\u05E4\u05E6\u05D4": 55.38
+  '10.04: BW': 15.8028
+domain_id:
+  "01.01: \u05E7\u05D1\u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9": "01: \u05DE\u05DC\u05D0\
+    \u05D9 \u05D5\u05D0\u05D7\u05E1\u05E0\u05D4"
+  "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA": "01: \u05DE\u05DC\u05D0\u05D9 \u05D5\u05D0\
+    \u05D7\u05E1\u05E0\u05D4"
+  "01.03: \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\u05DD": "01:\
+    \ \u05DE\u05DC\u05D0\u05D9 \u05D5\u05D0\u05D7\u05E1\u05E0\u05D4"
+  "01.04: \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\u05DD": "01:\
+    \ \u05DE\u05DC\u05D0\u05D9 \u05D5\u05D0\u05D7\u05E1\u05E0\u05D4"
+  "01.05: \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\u05DD": "01:\
+    \ \u05DE\u05DC\u05D0\u05D9 \u05D5\u05D0\u05D7\u05E1\u05E0\u05D4"
+  "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4": "01: \u05DE\u05DC\u05D0\u05D9 \u05D5\u05D0\
+    \u05D7\u05E1\u05E0\u05D4"
+  "01.11: \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\u05D3\u05E0\u05D9\u05DD": "01:\
+    \ \u05DE\u05DC\u05D0\u05D9 \u05D5\u05D0\u05D7\u05E1\u05E0\u05D4"
+  "01.12: \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA": "01:\
+    \ \u05DE\u05DC\u05D0\u05D9 \u05D5\u05D0\u05D7\u05E1\u05E0\u05D4"
+  "01.14: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9": "01: \u05DE\
+    \u05DC\u05D0\u05D9 \u05D5\u05D0\u05D7\u05E1\u05E0\u05D4"
+  "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\u05DD": "01: \u05DE\u05DC\u05D0\u05D9 \u05D5\
+    \u05D0\u05D7\u05E1\u05E0\u05D4"
+  "01.16: \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA": "01:\
+    \ \u05DE\u05DC\u05D0\u05D9 \u05D5\u05D0\u05D7\u05E1\u05E0\u05D4"
+  "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA": "01: \u05DE\u05DC\u05D0\u05D9 \u05D5\u05D0\
+    \u05D7\u05E1\u05E0\u05D4"
+  "01.18: \u05D1\u05D9\u05DE\"\u05DC\u05D9\u05DD": "01: \u05DE\u05DC\u05D0\u05D9 \u05D5\
+    \u05D0\u05D7\u05E1\u05E0\u05D4"
+  "02.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\u05E9\u05E8\u05EA": "02:\
+    \ \u05E9\u05E8\u05E9\u05E8\u05EA \u05D0\u05E1\u05E4\u05E7\u05D4"
+  "02.02: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": "02:\
+    \ \u05E9\u05E8\u05E9\u05E8\u05EA \u05D0\u05E1\u05E4\u05E7\u05D4"
+  "02.06: \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": "02:\
+    \ \u05E9\u05E8\u05E9\u05E8\u05EA \u05D0\u05E1\u05E4\u05E7\u05D4"
+  "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\u05EA": "02: \u05E9\u05E8\u05E9\u05E8\u05EA\
+    \ \u05D0\u05E1\u05E4\u05E7\u05D4"
+  "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\u05EA": "02: \u05E9\u05E8\u05E9\u05E8\u05EA\
+    \ \u05D0\u05E1\u05E4\u05E7\u05D4"
+  "02.12: \u05EA\u05D9\u05E7\u05D5\u05E0\u05D9\u05DD": "02: \u05E9\u05E8\u05E9\u05E8\
+    \u05EA \u05D0\u05E1\u05E4\u05E7\u05D4"
+  "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\u05EA": "02: \u05E9\u05E8\u05E9\u05E8\u05EA\
+    \ \u05D0\u05E1\u05E4\u05E7\u05D4"
+  "02.18: \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD": "02:\
+    \ \u05E9\u05E8\u05E9\u05E8\u05EA \u05D0\u05E1\u05E4\u05E7\u05D4"
+  '02.23: MRP': "02: \u05E9\u05E8\u05E9\u05E8\u05EA \u05D0\u05E1\u05E4\u05E7\u05D4"
+  "02.24: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\u05D9\u05DF": "02:\
+    \ \u05E9\u05E8\u05E9\u05E8\u05EA \u05D0\u05E1\u05E4\u05E7\u05D4"
+  "04.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9": "04:\
+    \ \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9"
+  "06.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\u05DC\u05D5\u05D2": "06:\
+    \ \u05E7\u05D8\u05DC\u05D5\u05D2"
+  "06.02: \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF": "06:\
+    \ \u05E7\u05D8\u05DC\u05D5\u05D2"
+  "06.03: \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2": "06:\
+    \ \u05E7\u05D8\u05DC\u05D5\u05D2"
+  "07.01: \u05D4\u05E4\u05E6\u05D4": "07: \u05D4\u05D5\u05D1\u05DC\u05D4"
+  '10.04: BW': "10: \u05E8\u05D7\u05D1\u05D9"
+pc:
+  "01.01: \u05E7\u05D1\u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9": 0.25
+  "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA": 0.28
+  "01.03: \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\u05DD": 0.52
+  "01.04: \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\u05DD": 0.67
+  "01.05: \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\u05DD": 0.29
+  "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4": 0.33
+  "01.11: \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\u05D3\u05E0\u05D9\u05DD": 0.33
+  "01.12: \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA": 0.34
+  "01.14: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9": 0.48
+  "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\u05DD": 0.36
+  "01.16: \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA": 0.29
+  "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA": 0.28
+  "01.18: \u05D1\u05D9\u05DE\"\u05DC\u05D9\u05DD": 0.33
+  "02.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\u05E9\u05E8\u05EA": 0.74
+  "02.02: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": 0.29
+  "02.06: \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": 0.38
+  "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\u05EA": 0.31
+  "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\u05EA": 0.39
+  "02.12: \u05EA\u05D9\u05E7\u05D5\u05E0\u05D9\u05DD": 0.29
+  "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\u05EA": 0.37
+  "02.18: \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD": 0.3
+  '02.23: MRP': 0.56
+  "02.24: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\u05D9\u05DF": 0.41
+  "04.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9": 0.8
+  "06.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\u05DC\u05D5\u05D2": 0.79
+  "06.02: \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF": 0.78
+  "06.03: \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2": 0.78
+  "07.01: \u05D4\u05E4\u05E6\u05D4": 1.0
+  '10.04: BW': 0.06
+process_id:
+  "01.01: \u05E7\u05D1\u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9": "01.01: \u05E7\u05D1\
+    \u05DC\u05D4 \u05DE\u05E8\u05DB\u05E9"
+  "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA": "01.02: \u05E2\u05E8\u05DB\u05D5\u05EA"
+  "01.03: \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\u05DD": "01.03:\
+    \ \u05D7\u05D9\u05D5\u05D1\u05D9\u05DD \u05D5\u05D6\u05D9\u05DB\u05D5\u05D9\u05D9\
+    \u05DD"
+  "01.04: \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\u05DD": "01.04:\
+    \ \u05D4\u05E9\u05E7\u05E2\u05D5\u05EA \u05D5\u05E4\u05D9\u05E8\u05D5\u05E7\u05D9\
+    \u05DD"
+  "01.05: \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\u05DD": "01.05:\
+    \ \u05D5\u05D9\u05E1\u05D5\u05EA\u05D9\u05DD \u05E4\u05E0\u05D9\u05DE\u05D9\u05D9\
+    \u05DD"
+  "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4": "01.06: \u05D0\u05D7\u05E1\u05E0\u05D4"
+  "01.11: \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\u05D3\u05E0\u05D9\u05DD": "01.11:\
+    \ \u05E1\u05E4\u05D9\u05E8\u05D5\u05EA \u05DE\u05DC\u05D0\u05D9, \u05D8\u05D9\u05E4\
+    \u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD \u05D5\u05D0\u05D5\u05D1\
+    \u05D3\u05E0\u05D9\u05DD"
+  "01.12: \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA": "01.12:\
+    \ \u05D2\u05E8\u05D9\u05D8\u05D5\u05EA \u05D5\u05D4\u05E9\u05DE\u05D3\u05D5\u05EA"
+  "01.14: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9": "01.14:\
+    \ \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9"
+  "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\u05DD": "01.15: \u05DB\u05D5\u05E9\u05E8\u05D9\
+    \u05DD"
+  "01.16: \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA": "01.16:\
+    \ \u05D4\u05DE\u05E8\u05D5\u05EA \u05D8\u05DB\u05E0\u05D9\u05D5\u05EA"
+  "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA": "01.17: \u05E1\u05D3\u05E8\u05D5\u05EA"
+  "01.18: \u05D1\u05D9\u05DE\"\u05DC\u05D9\u05DD": "01.18: \u05D1\u05D9\u05DE\"\u05DC\
+    \u05D9\u05DD"
+  "02.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\u05E9\u05E8\u05EA": "02.01:\
+    \ \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 -  \u05E9\u05E8\
+    \u05E9\u05E8\u05EA"
+  "02.02: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": "02.02:\
+    \ \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA"
+  "02.06: \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA": "02.06:\
+    \ \u05D4\u05D7\u05D6\u05E8\u05D5\u05EA \u05DE\u05D9\u05D7\u05D9\u05D3\u05D5\u05EA"
+  "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\u05EA": "02.08: \u05DE\u05DB\u05D9\u05E8\u05D5\
+    \u05EA"
+  "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\u05EA": "02.11: \u05D4\u05D7\u05DC\u05E4\u05D5\
+    \u05EA"
+  "02.12: \u05EA\u05D9\u05E7\u05D5\u05E0\u05D9\u05DD": "02.12: \u05EA\u05D9\u05E7\u05D5\
+    \u05E0\u05D9\u05DD"
+  "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\u05EA": "02.13: \u05D4\u05E9\u05D0\u05DC\u05D5\
+    \u05EA"
+  "02.18: \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD": "02.18:\
+    \ \u05D8\u05D9\u05E4\u05D5\u05DC \u05D1\u05D4\u05E4\u05E8\u05E9\u05D9\u05DD"
+  '02.23: MRP': '02.23: MRP'
+  "02.24: \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\u05D9\u05DF": "02.24:\
+    \ \u05D0\u05E1\u05E4\u05E7\u05D4 \u05DC\u05DC\u05D0 \u05E1\u05D9\u05DE\u05D5\u05DB\
+    \u05D9\u05DF"
+  "04.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9": "04.01:\
+    \ \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05EA\u05E7\
+    \u05E6\u05D9\u05D1 \u05D5\u05E8\u05DB\u05E9"
+  "06.01: \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\u05DC\u05D5\u05D2": "06.01:\
+    \ \u05DE\u05D1\u05E0\u05D4 \u05D0\u05E8\u05D2\u05D5\u05E0\u05D9 - \u05E7\u05D8\
+    \u05DC\u05D5\u05D2"
+  "06.02: \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF": "06.02:\
+    \ \u05DE\u05DE\u05E9\u05E7 \u05E0\u05EA\u05D5\u05E0\u05D9 \u05E7\u05D8\u05DC\u05D5\
+    \u05D2 \u05DC\u05D6\u05DB\u05D9\u05D9\u05DF"
+  "06.03: \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2": "06.03:\
+    \ \u05E9\u05D9\u05E0\u05D5\u05D9\u05D9\u05DD \u05D1\u05DE\u05E2\u05E8\u05DB\u05D5\
+    \u05EA \u05D4\u05E7\u05D8\u05DC\u05D5\u05D2"
+  "07.01: \u05D4\u05E4\u05E6\u05D4": "07.01: \u05D4\u05E4\u05E6\u05D4"
+  '10.04: BW': '10.04: BW'

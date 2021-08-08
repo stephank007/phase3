@@ -3,10 +3,8 @@ import codecs
 import yaml
 import warnings as warning
 import pandas as pd
-
 import dash
 import flask
-
 from flask import Flask
 from datetime import date
 from dash.dependencies import Input, Output, State
@@ -91,6 +89,13 @@ def requirements_status(selection, df_requirements, click, n_clicks):
     return requirements_table
 
 @app.callback(
+    Output('gantt-chart', 'figure'),
+    [Input('rule-radio-items', 'value')],
+)
+def gantt_rendition(rule):
+    return ap.gantt_page_filter_data(rule)
+
+@ app.callback(
     Output("page-content", "children"),
     [
         Input("url", "pathname"),

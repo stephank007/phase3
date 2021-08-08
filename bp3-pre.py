@@ -30,7 +30,7 @@ def prepare_domain():
     return df_dm, domain_m
 
 def prepare_process():
-    df_bp_x = pd.read_excel(fn, sheet_name='process_ref')
+    df_bp_x = df_process_ref.copy()
     df_bp_x['process'] = df_bp_x['process'].map(lambda x: f'{str(x):0>5}')
     status_map = config['program_status_map'].get('bp_status_map')
     df_bp_x = df_bp_x.rename(columns={'xRN': 'RN'})
@@ -88,6 +88,7 @@ def insert_hd1_rows(df=pd.DataFrame()):
     df_hd = df[df['row_type'] == 'parent']
     df_hd = df_hd.copy()
     df_hd['hd_1'] = df_hd['RN'].apply(lambda x: '.'.join(x.split('.')[0:2]))
+    df_hd['hd_1'] = df_hd['process']
     df_hd['hd_1'] = df_hd.apply(lambda x: str(x.hd_1) + '.' + str(x.rule), axis=1)
 
     df_y = pd.DataFrame()
@@ -108,131 +109,65 @@ def insert_hd1_rows(df=pd.DataFrame()):
     return df
 
 def insert_realization_requirements():
-    """ create in_dev_map to identify which requirements is in realization """
-    df_shortlist = pd.read_excel(f4, sheet_name='Sheet1')
-    df_in_dev = df_shortlist.copy()
-    df_in_dev.set_index('RN', inplace=True)
-    in_dev_map = df_in_dev.to_dict()
+    df_shortlist.rename(columns=config['realization_columns_map'], inplace=True)
+    df_shortlist['logmar_process'] = df_shortlist['logmar_process'].str.strip()
+    df_shortlist['s_rule']         = df_shortlist['s_rule'].str.strip()
+    df_shortlist['Name']           = df_shortlist['Name'].str.strip()
+    df_shortlist['xRN']            = df_shortlist['xRN'].str.strip()
 
-    """ 
-        df_dev is the full list of requirements --> it's RN is an old RN which is not mapped properly to its rule
-        df_shortlist is what had been decided as the shortlist for development
-    """
-    df_dev = pd.read_excel(f1, sheet_name='דרישות')
-    df_dev.rename(columns=config['realization_columns_map'], inplace=True)
-    df_dev['in-dev']  = df_dev.RN.map(in_dev_map.get('Task Name'))
-    df_dev['in-dev']  = df_dev['in-dev'].apply(lambda x: True if isinstance(x, str) else False)
-    """ select realization eligible rows """
-    df_dev = df_dev[df_dev['in-dev']]
-    df_dev['d-start']     = df_dev.RN.map(in_dev_map.get('Start'))
-    df_dev['d-finish']    = df_dev.RN.map(in_dev_map.get('Finish'))
-    df_dev['d-pc']        = df_dev.RN.map(in_dev_map.get('% Complete'))
-    df_dev['d-duration']  = df_dev.RN.map(in_dev_map.get('Duration'))
-    df_dev['d-duration']  = df_dev['d-duration'].apply(lambda x: x.split(' ')[0])
-    df_dev['d-duration']  = df_dev['d-duration'].astype(float)
+    p_logmar_map = df_domain_reference[['p_logmar', 'process_id']]
+    p_logmar_map.set_index('p_logmar', inplace=True)
+    p_logmar_map = p_logmar_map.to_dict()
 
-    pmo_p = df_dev.columns[8]
-    df_dev.rename(columns={
-        pmo_p  : 'pmo_priority',
-        'RN'   : 'xRN'
-    }, inplace=True)
-    df_dev['s_rule'] = df_dev['s_rule'].str.strip()
+    p_ref_map = df_process_ref.copy()
+    p_ref_map = p_ref_map[['process', 'domain', 'domain_id', 'process_id']]
+    p_ref_map['process'] = p_ref_map['process'].apply(lambda x: f'{x:0>5}')
+    p_ref_map['domain']  = p_ref_map['domain'].apply(lambda x: f'{x:0>2}')
+    p_ref_map.set_index('process_id', inplace=True)
+    p_ref_map = p_ref_map.to_dict()
 
-    """ map rule as per domain_ref--> logmar_rule"""
-    s_rule_map = df_domain_reference[['logmar_rule', 'rule']]
-    s_rule_map = s_rule_map[s_rule_map['logmar_rule'].notnull()]
-    s_rule_map.set_index('logmar_rule', inplace=True)
-    s_rule_map = s_rule_map.to_dict()
-    df_dev['rule'] = df_dev['s_rule'].map(s_rule_map.get('rule'))
-    # df_dev['rule'] = df_dev['s_rule'].map(config.get('s_rule_map'))
-    # df_dev = df_dev[df_dev['rule'] != 'ignore']
-    # df_dev = df_dev[df_dev['s_rule'].notnull()]
-    """ logmar rule map complete"""
+    df_shortlist['process_id'] = df_shortlist.logmar_process.map(p_logmar_map.get('process_id'))
+    process_check              = df_shortlist['process_id'].isnull().any()
+    if process_check:
+        raise LogmarProcessNotMapped
 
-    """ !!!!! Not is use !!!!! -- map logmar notes to to ignore/open open: is an issue open to product manager """
-    logmar_notes_map = df_domain_reference[['logmar_notes', 'rule']]
-    logmar_notes_map.set_index('logmar_notes', inplace=True)
-    logmar_notes_map = logmar_notes_map.to_dict()
-    df_dev['logmar_rule'] = df_dev.logmar_notes.map(logmar_notes_map.get('rule'))
-    """ logmar notes complete"""
+    df_shortlist['process']   = df_shortlist.process_id.map(p_ref_map.get('process'))
+    df_shortlist['domain']    = df_shortlist.process_id.map(p_ref_map.get('domain'))
+    df_shortlist['domain_id'] = df_shortlist.process_id.map(p_ref_map.get('domain_id'))
+    df_shortlist['rule']      = df_shortlist['s_rule'].apply(lambda x: config['s_rule_map'].get(x))
+    rule_check                = df_shortlist['rule'].isnull().any()
+    if rule_check:
+        raise LogmarRuleNotMapped
 
-    df_dev['process'] = df_dev['process_id'].apply(lambda x1: x1.split(':')[0])
-    df_dev['domain']  = df_dev['domain_id'].apply(lambda x1: x1.split(':')[0])
-
-    df_dev.sort_values(by=['domain', 'process', 'rule'], inplace=True)
-    df_dev.reset_index(inplace=True)
-
-    """ apply real RN as per the assigned rule ignoring realization file RN while keeping it as xRN """
-    for process in df_dev['process_id'].unique():
-        df_p = df_dev[df_dev['process_id'] == process]
-        for rule in df_p['rule'].unique():
-            df_rule = df_p[df_p['rule'] == rule]
-            df_rule = df_rule.copy()
-            df_rule['number'] = np.arange(1, len(df_rule) + 1)
-            df_rule['number'] = df_rule['number'].apply(lambda x1: f'{x1:0>2}')
-            df_rule['RN']     = df_rule['process'] + '.' + rule + '.' + df_rule['number']
-            df_dev.loc[df_rule.index.min(): df_rule.index.max(), 'RN']   = df_rule['RN']
-            df_dev.loc[df_rule.index.min(): df_rule.index.max(), 'rule'] = rule
+    df_shortlist['domain ']  = df_shortlist['domain'].apply(lambda x: f'{x:0>2}')
+    df_shortlist['process']  = df_shortlist['process'].apply(lambda x: f'{x:0>5}')
+    df_shortlist['Duration'] = df_shortlist['Duration'].apply(lambda x: x.split(' ')[0])
+    df_shortlist['row_type'] = 'parent'
 
     """ assigning the matching status to the realization requirements """
     df_rule_status = df_rl[df_rl['RN'].str.contains('.02.03')]
     df_rule_status = df_rule_status[['Rule', 'Name']]
     df_rule_status.set_index('Rule', inplace=True)
     status_map = df_rule_status.to_dict()
-    df_dev['status']   = df_dev['rule'].map(status_map.get('Name'))
-    # df_dev['status']   = 'תכנון והתחלת פיתוח'
+    df_shortlist['status'] = df_shortlist['rule'].map(status_map.get('Name'))
 
-    df_dev['lc-RN']    = df_dev['RN'] + '.02.03'
-    df_dev['parent']   = df_dev.get('RN')
-    df_dev['row_type'] = 'parent'
-    df_dev['due_date'] = df_dev['d-finish'].apply(
-        lambda x: wd.workday(
-            pd.to_datetime(x, format='%d/%m/%Y'),
-            days=10,
-            holidays=holidays,
-            weekends=weekends
-        )
-    )
-    df_dev['d-finish'] = df_dev['due_date']
-    df_dev['t_shirt']  = 'M'
-    df_dev['source']   = 'requirements'
-    df_dev['waiting']  = None
-#     """ This chapter is adding the GEN tasks from the task file """
-#     df_tsk = pd.read_excel(f3, sheet_name='משימות')
-#     df_tsk.rename(columns=config['tasks_columns_map'], inplace=True)
-#     df_tsk['status'] = df_tsk.status.map(config['tasks_status_map'])
-#
-#     df_tsk = df_tsk[df_tsk['RN'].notnull()]
-#     mask = ~df_tsk['status'].isin(['בוטל', 'משימה בוצעה במלואה' ])
-#     df_tsk = df_tsk[mask]
-#     df_tsk['row_type'] = 'parent'
-#     df_tsk['parent']   = df_tsk.get('RN')
-#     df_tsk['source']   = 'tasks'
-#     df_tsk['rule']     = 'GEN'
-#
-#     df_dev = pd.concat([df_dev, df_tsk], ignore_index=True)
-#     df_dev = df_dev[config.get('realization_columns')]
+    df_shortlist.sort_values('process_id', inplace=True)
+    """ apply real RN as per the assigned rule ignoring realization file RN while keeping it as xRN """
+    for process in df_shortlist['process_id'].unique():
+        df_p = df_shortlist[df_shortlist['process_id'] == process]
+        for rule in df_p['rule'].unique():
+            df_rule = df_p[df_p['rule'] == rule]
+            i_list = df_rule.index
+            df_rule = df_rule.copy()
+            df_rule['number'] = np.arange(1, len(df_rule) + 1)
+            df_rule['number'] = df_rule['number'].apply(lambda x1: f'{x1:0>2}')
+            df_rule['RN']     = df_rule['process'] + '.' + rule + '.' + df_rule['number']
+            df_shortlist.loc[i_list, 'RN']   = df_rule['RN']
+            df_shortlist.loc[i_list, 'rule'] = rule
 
-    """ filter only what is in development """
-    df_dev = df_dev[df_dev['RN'].notnull()]
-
-    return df_dev
-
-def assign_fields_from_RN(df=pd.DataFrame()):
-    df_dev = df[df['row_type'] == 'parent']
-    df_dev = df_dev.copy()
-
-    df_dev['domain'] = df_dev['domain'].apply(lambda x: f'{int(x):0>2}')
-    for index, row in df_dev.iterrows():
-        wbs = row.get('RN').split('.')
-        df.loc[index, 'domain']   = f'{int(wbs[0]):0>2}'
-        df.loc[index, 'process']  = '.'.join(wbs[0:2])
-        df.loc[index, 'rule']     = wbs[2]
-
-    df[index, 'domain_id']  = df.domain.map(domain_map.get('domain_id'))
-    df[index, 'process_id'] = df.process.map(process_map.get('process_id'))
-
-    return df
+    df_shortlist['parent'] = df_shortlist['RN']
+    df_shortlist['source'] = 'logmar'
+    return df_shortlist
 
 def insert_project_header():
     df_dl     = pd.read_excel(f5, sheet_name='dl')
@@ -246,8 +181,8 @@ def insert_project_header():
     mrs_uids = [int(x) for x in mrs_uids if np.isnan(x) == False]
     mask = df_mrs['Unique_ID'].isin(mrs_uids)
     df_mrs = df_mrs[mask]
-    df_mrs['Start']  = pd.to_datetime(df_mrs['Start_Date'], format='%B %d, %Y %H:%M %p').dt.strftime('%d/%m/%Y')
-    df_mrs['Finish'] = pd.to_datetime(df_mrs['Finish_Date'], format='%B %d, %Y %H:%M %p').dt.strftime('%d/%m/%Y')
+    df_mrs['Start']  = pd.to_datetime(df_mrs['Start_Date'],  format='%d %B %Y %H:%M').dt.strftime('%d/%m/%Y')
+    df_mrs['Finish'] = pd.to_datetime(df_mrs['Finish_Date'], format='%d %B %Y %H:%M').dt.strftime('%d/%m/%Y')
     df_mrs = df_mrs[['Unique_ID', 'Start', 'Finish', 'Percent_Complete']]
     df_mrs.set_index('Unique_ID', inplace=True)
     mrs_map = df_mrs.to_dict()
@@ -335,13 +270,12 @@ def insert_rule_block(df=pd.DataFrame()):
     x = len(parent_list)
     print('{:23}: {}'.format('parent list', len(parent_list)))
 
-    keys = ('RN', 'Rule', 'Name', 'p_rule', 'alias', 'isMS', 'Work', 'S', 'M', 'L',
-     'XL', 't_shirt_tuple', 'parent', 'row_type', 'rule', 'domain_id',
-     'process_id')
     rule_data = []
     for p in parent_list:
         row = df[df['RN'] == p]
         name = row.get('Name').values[0]
+        xrn  = row.xRN.values[0]
+        source = row.source.values[0] if row.source.values[0] == 'logmar' else None
         try:
             rule = row['rule'].values[0]
         except Exception as e:
@@ -351,11 +285,13 @@ def insert_rule_block(df=pd.DataFrame()):
         df_r = df_rl[df_rl['Rule'].isin([rule])]
         df_r = df_r.copy()
 
-        df_r['RN'] = p + df_r['RN']
-        df_r['parent'] = p
-        df_r['row_type'] = 'rule'
-        df_r['rule'] = rule
-        df_r['domain_id'] = df[(df['RN'].isin([p]))]['domain_id'].values[0]
+        df_r['RN']         = p + df_r['RN']
+        df_r['xRN']        = xrn
+        df_r['parent']     = p
+        df_r['source']     = source
+        df_r['row_type']   = 'rule'
+        df_r['rule']       = rule
+        df_r['domain_id']  = df[(df['RN'].isin([p]))]['domain_id'].values[0]
         df_r['process_id'] = df[(df['RN'].isin([p]))]['process_id'].values[0]
 
         """ this is instead of the old and very slow pd.concat """
@@ -396,6 +332,18 @@ if __name__ == '__main__':
     pc = '% Complete'
     OL = 'Outline Level'
 
+    class Error(Exception):
+        """ Base Class """
+        pass
+
+    class LogmarProcessNotMapped(Error):
+        """ raised when logmar process cannot be mapped """
+        pass
+
+    class LogmarRuleNotMapped(Error):
+        """ raised when logmar process cannot be mapped """
+        pass
+
     pd.options.mode.chained_assignment = 'raise'
     start_a = time.time()
 
@@ -405,33 +353,22 @@ if __name__ == '__main__':
     (MON, TUE, WED, THU, FRI, SAT, SUN) = range(7)
     holidays = pd.to_datetime(config['holidays'])
     weekends = (FRI, SAT)
-    dt = config['history'].get('date')
-    history = config['execution_params'].get('history')
-    if history:
-        print('History execution')
-        path = config['history'].get('path')
-        fn = os.path.join(path, config['history'].get('name'))
-        fr = os.path.join(path, config['history'].get('pmo'))
-        fo = os.path.join(path, config['history'].get('out'))
-        fs = os.path.join(path, config['history'].get('skeleton'))
-        f1 = os.path.join(path, config['history'].get('requirements'))
-        f2 = os.path.join(path, config['history'].get('domain'))
-        print(fn)
-    else:
-        path = config['config'].get('path')
-        fn = os.path.join(path, config['config'].get('name'))
-        fr = os.path.join(path, config['config'].get('pmo'))
-        fo = os.path.join(path, config['config'].get('out'))
-        fs = os.path.join(path, config['config'].get('skeleton'))
-        f1 = os.path.join(path, config['config'].get('requirements'))
-        f2 = os.path.join(path, config['config'].get('name'))
-        f3 = os.path.join(path, config['config'].get('tasks'))
-        f4 = os.path.join(path, config['config'].get('shortlist'))
-        f5 = config['config'].get('pdr-meeting')
-        f6 = os.path.join(path, config['config'].get('mrs'))
 
-    df_domain_reference = pd.read_excel(f2, sheet_name='domain_ref')
-    df_rl = pd.read_excel(fr, sheet_name='Lines')
+    path = config['config'].get('path')
+    fn = os.path.join(path, config['config'].get('name'))
+    fr = os.path.join(path, config['config'].get('pmo'))
+    fo = os.path.join(path, config['config'].get('out'))
+    fs = os.path.join(path, config['config'].get('skeleton'))
+    f3 = os.path.join(path, config['config'].get('tasks'))
+    f4 = os.path.join(path, config['config'].get('shortlist'))
+    f5 = config['config'].get('pdr-meeting')
+    f6 = os.path.join(path, config['config'].get('mrs'))
+
+    df_process_ref      = pd.read_excel(fn, sheet_name='process_ref')
+    df_domain_reference = pd.read_excel(fn, sheet_name='domain_ref')
+    df_rl               = pd.read_excel(fr, sheet_name='Lines')
+    df_shortlist        = pd.read_excel(f4, sheet_name='Sheet1')
+
     df_rl['t_shirt_tuple'] = df_rl[df_rl.columns[7:12]].apply(tuple, axis=1)
 
     df_b1, domain_map  = prepare_domain()
@@ -439,21 +376,15 @@ if __name__ == '__main__':
 
     df_bp = pd.concat([df_b1, df_b2, insert_realization_requirements()], ignore_index=True, sort=False)
 
-    # df_bp = assign_fields_from_RN(df=df_bp)
-    # df_bp = pd.concat([df_bp, prepare_interface(), insert_project_header()], ignore_index=True, sort=False)
     df_bp = pd.concat([df_bp, insert_project_header()], ignore_index=True, sort=False)
     df_bp = insert_hd1_rows(df=df_bp)
 
     start = time.time()
-    if history:
-        df_bp['rule'] = df_bp['rule'].fillna(' ')
-        df_bp['rule'] = df_bp['rule'].apply(lambda x: 'is' + x if dt < '27/12/2021' else x)
 
     ''' rules handler '''
     start_z = time.time()
     r_data = insert_rule_block(df=df_bp)
     df_rules = pd.DataFrame(r_data)
-    # df_rules = insert_rule_block(df=df_bp)
     print('{:23}: {:.3f}'.format('insert rule block: ', time.time() - start_z))
     ''' end of rules handler'''
 
@@ -472,13 +403,11 @@ if __name__ == '__main__':
     df_bp['row_number'] = df_bp.index
 
     df_bp = df_bp[config['skeleton_columns']]
-    df_dv = df_bp[df_bp['lc-RN'].notnull()]
-    df_dv = df_dv[['lc-RN', 'd-start', 'd-finish', 'd-pc', 'd-duration']]
+    df_bp['domain'] = df_bp['domain'].apply(lambda x: f'{x:0>2}')
 
     writer = pd.ExcelWriter(fs, engine='xlsxwriter')
     workbook = writer.book
     df_bp.to_excel(writer, sheet_name='skeleton')
-    df_dv.to_excel(writer, sheet_name='dev')
     writer.save()
     print('{:23}: {:.3f}'.format('Total Execution time', time.time() - start_a))
     quit(1)

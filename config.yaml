@@ -12,7 +12,7 @@ config:
   web          : ./data/web/
   name         : _in/phase3-bp.xlsx
   requirements : _in/requirements.xlsx
-  shortlist    : _in/rrquirements-shortlist.xlsx
+  shortlist    : _in/requirements-shortlist.xlsx
   n_shortlist  : _in/shortlist.xlsx
   moria        : _in/moria.xlsm
   pmo          : _in/rules_DB.xlsx
@@ -22,6 +22,7 @@ config:
   skeleton     : _out/p3-skeleton.xlsx
   p3BI         : _out/p3-BI.xlsx
   gantt        : _out/g_data_x.xlsx
+  gantt-int    : _out/g_data_x_INT.xlsx
   reconcile    : _out/reconcile.xlsx
   late         : _out/late_report.xlsx
   letters      : _out/letters.xlsx
@@ -38,7 +39,7 @@ config:
   p3-robot     : bp3.py
   p3-skeleton  : bp3-pre.py
   consolidated : _out\p3-consolidated.xlsx
-  transfer     : ./data/_in/transfer
+  transfer     : ./transfer
   sc_path      : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\מלאי
   # requirements : \\hmlotemvfs\mzpn181\PublicMzpn181\Logmar\מרהס\מרהס שלב ג\ספריית שיתוף אמלח\דרישות ממערכת SAP הצהלית וממערכת WMS הזכיין.xlsx
   tasks        : \\hratalvfs\PublicMate\Tikshuv\erp\All\ענף מערכות מידע לוגיסטיות\פרוייקטים\מרה''ס שלב ג\0 ניהול הפרויקט\מלאי\מרהס שלב ג - קובץ משימות.xlsx
@@ -165,6 +166,19 @@ holidays:
   - 20210525
   - 20210526
   - 20210527
+  - 20210906
+  - 20210907
+  - 20210908
+  - 20210915
+  - 20210916
+  - 20210920
+  - 20210921
+  - 20210922
+  - 20210923
+  - 20210926
+  - 20210927
+  - 20210928
+  - 20211128
 
 bdays:
   holidays   : ['20200920','20200927','20200928','20201004','20201005','20201006','20201007','20201008']
@@ -426,9 +440,9 @@ skeleton_columns:
   - rule
   - Deadline
   - task_notes
-  - task_notes_2
-  # - function_requirement_reference
-  - sub_process
+#  - task_notes_2
+#  - function_requirement_reference
+#  - sub_process
   - source
   - Outline Level
   - p_rule
@@ -436,12 +450,14 @@ skeleton_columns:
   - alias
   - isMS
   - row_number
-  - pmo_priority
-  - d-start
-  - d-finish
-  - d-pc
-  - lc-RN
-  - d-duration
+  - Start
+  - Finish
+#   - pmo_priority
+#   - d-start
+#   - d-finish
+#   - d-pc
+#   - lc-RN
+#   - d-duration
   - domain
   - process
 
@@ -464,7 +480,7 @@ consolidated_columns:
   - task_notes
   - task_notes_2
   # - function_requirement_reference
-  - sub_process
+#  - sub_process
   - source
   - Outline Level
   - p_rule
@@ -473,7 +489,7 @@ consolidated_columns:
   - rule
   - isMS
   - row_number
-  - task_notes_2
+#  - task_notes_2
 
 dfP:
   RN      : Text1
@@ -486,6 +502,9 @@ dfP:
   source  : Text8
   rule    : Text9
   alias   : Text10
+  process : Text11
+  process_id: Text12
+  domain_id : Text13
   isMS    : Milestone
 
 dfP_columns:
@@ -501,7 +520,7 @@ dfP_columns:
   - Work
   - Milestone
   - Predecessors
-# - Successors
+#  - Successors
   - Text10
   - Text8
   - Text1
@@ -512,6 +531,9 @@ dfP_columns:
   - Text7
   - Text9
   - Text4
+  - Text11
+  - Text12
+  - Text13
   - Name
   - Deadline
 #  - Resource Names
@@ -541,8 +563,10 @@ realization_columns_map: {
   הערות                            : task_notes,
   הערות אמל"ח                      : task_notes_2,
   תרחיש                            : domain_id,
-  תהליך                            : process_id,
-  'הערות קפטי"ה'                   : logmar_notes
+  תהליך                            : logmar_process,
+  'הערות קפטי"ה'                   : logmar_notes,
+  Task Name                        : Name,
+  RN                               : xRN
 }
 
 s_rule_map: {
@@ -558,8 +582,12 @@ s_rule_map: {
   הסבה           :  CNV,
   TMS            :  TMS,
   'ממשקים: SAP  - תומר' : INT,
-  SAP -> WMS     : SAP,
+  SAP -> WMS     : WMS,
+  SAP -> ממשקים  : INT,
+  SAP-> ממשקים   : INT,
   WMS/TMS        : WMS,
+  IMP            : SAP,
+  INT            : INT,
 }
 
 realization_columns:
@@ -592,10 +620,12 @@ df_bi_columns:
   - domain_id
   - process_id
   - parent
+  - Duration
   - Start_Date
   - Finish_Date
   - row_type
   - m_task
+  - rule
   - publish
   - month
   - pc

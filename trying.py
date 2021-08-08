@@ -1,34 +1,74 @@
 import os
 import codecs
 import pandas as pd
+import numpy as np
 import warnings as warning
 import yaml
-import mongo_services as ms
+import plotly.express as px
+import plotly.graph_objects as go
+import dash_core_components as dcc
+import dash_html_components as html
+import dash_bootstrap_components as dbc
+import dash_table as dt
+import r_heatmap
+import r_stacked
+import plotly.offline as pyo
 
-pd.options.mode.chained_assignment = 'raise'  # pd.options.mode.chained_assignment = None
+pd.options.mode.chained_assignment = 'raise'
 warning.filterwarnings('ignore')
+print(125 * '=')
+
 with codecs.open('config.yaml', 'r', encoding='utf-8') as f:
     config = yaml.safe_load(f)
 
+holidays = []
+for d in config['bdays'].get('holidays'):
+    holidays.append(pd.to_datetime(d))
+weekmask   = config['bdays'].get('bdays')
+custombday = pd.offsets.CustomBusinessDay(weekmask=weekmask, holidays=holidays)
+
+holidays = pd.to_datetime(config['holidays'])
+(MON, TUE, WED, THU, FRI, SAT, SUN) = range(7)
+weekends = (FRI, SAT)
+
 path = config['config'].get('path')
-pmo  = os.path.join(path, config['config'].get('dev-cmp'))
+f3 = os.path.join(path, config['config'].get('p3BI'))
+fo = os.path.join(path, '_out/xyz.html')
 
-db = ms.mongo_connect()
-writer = pd.ExcelWriter(pmo, engine='xlsxwriter')
-dt = '2020-05-04'
+df = pd.read_excel(f3, sheet_name='Task_Table1')
+print(df.columns)
+df = df[(  df['source'] == 'logmar' )]
+df = df[( df['RN'].str.endswith('.02.03') ) ]  # filter development tasks
 
-for sheet in ['Requirements']:
-    collection = ms.get_collection(db, sheet)
-    updateResult = collection.update_many(
-        {'index': dt + ':x1'},
-        {
-            '$set': {'index': dt}
-        }
-    )
-    df = ms.retrieve_history(collection, dt)
-    print(df.shape)
+df['value'] = 1
+moshe = px.sunburst(
+    df,
+    path=['rule', 'domain_id', 'process_id'],
+    values='value',
+)
+ids     = moshe.data[0]['ids']
+labels  = moshe.data[0]['labels']
+parents = moshe.data[0]['parents']
+domain  = moshe.data[0]['domain']
 
-quit(0)
-workbook = writer.book
-df.to_excel(writer, sheet_name=sheet)
-writer.save()
+world_countries_data = pd.read_csv("datasets/countries of the world.csv")
+world_countries_data["World"] = "World"
+indian_district_population = pd.read_csv("datasets/indian-census-data-with-geospatial-indexing/district wise population for year 2001 and 2011.csv")
+indian_district_population["Country"] = "India"
+
+region_wise_pop = world_countries_data.groupby(by="Region").sum()[["Population"]].reset_index()
+
+parents = [""] + ["World"] *region_wise_pop.shape[0] + world_countries_data["Region"].values.tolist()
+labels = ["World"] + region_wise_pop["Region"].values.tolist() + world_countries_data["Country"].values.tolist()
+values  = [world_countries_data["Population"].sum()] + region_wise_pop["Population"].values.tolist() + world_countries_data["Population"].values.tolist()
+
+fig =go.Figure(go.Sunburst(
+    parents=parents,
+    labels= labels,
+    values= values,
+))
+
+fig.update_layout(title="World Population Per Country Per Region",
+                  width=700, height=700)
+
+pyo.plot(fig, filename=fo)

@@ -93,7 +93,8 @@ def risk_heatmap():
             size=18,
             color="RebeccaPurple"
         ),
-        paper_bgcolor='#9ab3a0',
+        # paper_bgcolor='#9ab3a0',
+        paper_bgcolor='#e1e1e1',
         plot_bgcolor='#c7d6cb',
         height = 600,
     )

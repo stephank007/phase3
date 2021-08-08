@@ -7,23 +7,6 @@ import warnings as warning
 import workday as wd
 import yaml
 import re
-import mongo_services as ms
-
-def db_query(collection=None, q=None):
-    collect = ms.get_collection(db, collection)
-    df_h = pd.DataFrame()
-    data = []
-
-    x = collect.find(q)
-    for r in x:
-        data.append(r.get('results'))
-
-    df_h = df_h.append(data, True)
-    if len(df_h) > 0:
-        print('.', end=' ')
-    else:
-        print('{:50}:'.format('empty query'))
-    return df_h
 
 def insert_mom(sheet_name):
     df_mx = pd.read_excel(fn, sheet_name=sheet_name)
@@ -47,9 +30,9 @@ def write_consolidated():
     df_bp['task_notes'] = df_bp['task_notes'].apply(lambda x: re.subn(newline, '--', str(x))[0])
     df_bp['task_notes_2'] = df_bp['task_notes_2'].apply(lambda x: re.subn(newline, '--', str(x))[0])
 
-    writer = pd.ExcelWriter(fz, engine='xlsxwriter')
-    df.to_excel(writer, sheet_name='Sheet2')
-    writer.save()
+    # writer = pd.ExcelWriter(fz, engine='xlsxwriter')
+    # df.to_excel(writer, sheet_name='Sheet2')
+    # writer.save()
     del df
 
     return df_bp
@@ -96,7 +79,6 @@ def update_lc_block():
             rule     = p_df.rule.values[0]
         except IndexError as ex:
             x = p
-            print(p, ex)
             quit(-1)
         p_status = p_df.status.values[0]
         lc_category = create_cycle_map(topic=rule)
@@ -170,8 +152,6 @@ def update_mom_block():
             print(p, ex)
             quit(0)
         df_bp.loc[idx_c, pc]         = df_mom_completed[pc]
-        # df_bp.loc[idx_c, CT]         = config['constraint_type'].get('MFO')
-        # df_bp.loc[idx_c, CD]         = df_mom_completed.due_date.dt.strftime('%d/%m/%Y')
         ''' finished df_mom_completed'''
 
         if len(df_c) == 0:
@@ -186,7 +166,6 @@ def update_mom_block():
 
         df_c.loc[i_min, 'Start'] = date_calc(sd=start_date, days= -int(df_c.loc[i_min, 'Work']))
 
-        # print('process_id: {}'.format(p))
         ''' stand alone MoM tasks '''
         df_i = df_i[(df_i[percent_complete] != 1) & (df_i['p_rule'] == 0)]
         if len(df_i) > 0:
@@ -222,36 +201,34 @@ def update_mom_block():
 
 def logmar_handler():
     """ df_dv is the dv sheet compiled in skeleton file """
-    df_dv.set_index('lc-RN', inplace=True)
-    df_dv.columns = ('d-ind', 'd-start', 'd-finish', 'd-pc', 'd-duration')
-    df_dv['d-ind'] = df_dv['d-ind'].astype(int)
-    dev_map = df_dv.to_dict()
-
-    df_bp['d-ind']      = df_bp.RN.map(dev_map.get('d-ind'))
-    df_bp['d-pc']       = df_bp.RN.map(dev_map.get('d-pc'))
-    df_bp['d-start']    = pd.to_datetime(df_bp.RN.map(dev_map.get('d-start')))
-    df_bp['d-finish']   = pd.to_datetime(df_bp.RN.map(dev_map.get('d-finish')))
-    df_x = df_bp[df_bp['d-ind'] > 0]
+    df_x = df_bp[df_bp['RN'].str.endswith('.02.03') & ( df_bp['source'] == 'logmar' )]
     df_x = df_x.copy()
-    df_x['d-duration'] = df_x.apply(
-        lambda x: len(
-            pd.date_range(x['d-start'], x['d-finish'], freq='C')
-        ), axis=1
-    )
-    df_x['d-start']    = df_x['d-start'].dt.strftime('%d/%m/%Y')
-    df_x['d-finish']   = df_x['d-finish'].dt.strftime('%d/%m/%Y')
+    i_list = df_x.index
+    df_bp.loc[i_list] = df_x
 
-    """ !!! Override default behaviour. This is to deal with all development rows received from logmar """
-    for index, row in df_x.iterrows():
-        df_bp.loc[index, 'source']   = 'logmar'
-        df_bp.loc[index, 'Start']    = row['d-start']
-        df_bp.loc[index, 'Finish']   = row['d-finish']
-        df_bp.loc[index, 'Duration'] = row['d-duration']
-        df_bp.loc[index, 'Work']     = row['d-duration']
-        df_bp.loc[index, pc]         = row['d-pc']
-        df_bp.loc[index, CD]         = row['d-finish']
-        df_bp.loc[index, CT]         = config['constraint_type'].get('MFO')
+    logmar_list = df_bp[( df_bp['row_type'] == 'parent' ) & ( df_bp['source'] == 'logmar' )]['RN'].to_list()
+    for logmar_parent in logmar_list:
+        parent_row = df_bp[( df_bp['RN'] == logmar_parent )]
+        parent_rn  = parent_row.RN.values[0]
+        s_date     = parent_row.RN.map(skeleton_map.get('Start')).values[0]
+        e_date     = parent_row.RN.map(skeleton_map.get('Finish')).values[0]
+        p_complete = parent_row.RN.map(skeleton_map.get('% Complete')).values[0]
+        logmar_row = df_bp[( df_bp['parent'] == parent_rn ) & ( df_bp['RN'].str.endswith('.02.03') )]
+        duration   = len(pd.date_range(s_date, e_date, freq='C'))
+        l_index    = logmar_row.index
+        df_bp.loc[l_index, 'Start']    = pd.to_datetime(s_date)
+        df_bp.loc[l_index, 'Finish']   = pd.to_datetime(e_date)
+        df_bp.loc[l_index, 'Duration'] = duration
+        df_bp.loc[l_index, pc]         = p_complete
+        if p_complete == 0:
+            df_bp.loc[l_index, CD] = pd.to_datetime(e_date).strftime('%d/%m/%Y')
+            df_bp.loc[l_index, CT] = config['constraint_type'].get('MFO')
+        else:
+            # df_bp.loc[l_index, CT] = config['constraint_type'].get('MSO')
+            df_bp.loc[l_index, 'Finish'] = None
+            df_bp.loc[l_index, 'Start'] = pd.to_datetime(s_date).strftime('%d/%m/%Y')
 
+    x = df_bp
     return df_bp
 
 def predecessor_handler():
@@ -276,87 +253,12 @@ def predecessor_handler():
             p_line     = str(df_m.index.max())
             df_bp.loc[rule_index, 'Predecessors'] = [p_line if len(df_m) > 0 else '']
 
-    return df_bp
+    logmar_mask = df_bp[( df_bp['source'] == 'logmar' ) & ( df_bp['RN'].str.endswith('.02.03') )]
+    logmar_mask = logmar_mask[logmar_mask[pc] > 0]
+    df_bp.loc[logmar_mask.index, 'Predecessors'] = ''
+#     df_bp.loc[logmar_mask.index, 'Duration'] = logmar_mask['Duration']
+#     df_bp.loc[logmar_mask.index, 'Work'] = logmar_mask['Duration']
 
-def m4n_deliverables_as_successors():
-    """ This is to deal with all m4n and header delivery rows which are predecessors/milestones to development tasks """
-    df_ems = df_bp[
-        (df_bp['row_type'].isin(['m4n-dl', 'm4n-ms'])) &
-        (df_bp['source'].notnull()) |
-        (df_bp['Task Mode'] == 'Manually Scheduled')
-    ]
-    for index, row in df_ems.iterrows():
-        dd = row.due_date
-        if row['Task Mode'] != 'Manually Scheduled':
-            dd = row.due_date.strftime('%d/%m/%Y')
-        df_bp.loc[index, 'Start']    = dd
-        df_bp.loc[index, 'Finish']   = dd
-        df_bp.loc[index, 'Duration'] = 0
-        df_bp.loc[index, 'isMS']     = 1
-        df_bp.loc[index, CD]         = dd
-        df_bp.loc[index, CT]         = config['constraint_type'].get('MFO')
-        df_bp.loc[index, 'source']   = row.source
-
-    """ This block is to assign m4n predecessors to the development tasks """
-    df_ems = df_ems.copy()
-    df_ems['row_number'] = df_ems.index
-    df_ems = df_ems[['source', 'row_number']]
-    df_ems.set_index('source', inplace=True)
-    ems_map = df_ems.to_dict()
-
-    """ This block is development requirements which have m4n predecessors (m4n-WBS) """
-    df_m4n = pd.read_excel(fr, sheet_name='m4n-preds')
-    df_m4n = df_m4n.copy()
-    for index, row in df_m4n.iterrows():
-        row.WBS = re.subn('\n', '', row.WBS)[0]
-        wbs_list = row.WBS.split(',')
-        predecessor_list = []
-        for wbs in wbs_list:
-            predecessor_list.append(str(int(ems_map.get('row_number').get(wbs))))
-        try:
-            rn        = df_bp[df_bp['xRN'] == row.xRN].RN.values[0]
-        except IndexError as ex:
-            print(row.RN, ex)
-        x_df      = df_bp[df_bp['parent'] == rn]
-        lc_index  = x_df.index.min() + 5
-        p_list    = ','.join(predecessor_list)
-        df_bp.loc[lc_index, 'Predecessors'] = p_list
-        df_bp.loc[lc_index, CT] = config['constraint_type'].get('ASAP')
-        df_bp.loc[lc_index, CD] = None
-        """ override the rule, since what's in logmar file takes priority """
-        if df_bp.loc[lc_index, 'source'] == 'logmar':
-            df_bp.loc[lc_index, CD] = df_bp.loc[lc_index, 'Finish']
-            df_bp.loc[lc_index, CT] = config['constraint_type'].get('MFO')
-
-    return df_bp
-
-def update_interfaces():
-    cn = [i for (i, j) in enumerate(df_bp.columns) if j == 'row_number'][0]
-
-    df_interfaces           = pd.read_excel(fn, sheet_name='interfaces')
-    df_interfaces           = df_interfaces[~df_interfaces['dependency'].isnull()]
-    df_interfaces['groups'] = df_interfaces['dependency'].str.split(',')
-    df_interfaces           = df_interfaces[['RN', 'process', 'dependency', 'groups', 'Name']]
-
-    ''' create parent list with r_group in the following structure xx.yy.GRP i.e. 01.01.INT '''
-    df_parent = df_bp[df_bp['row_type'] == 'parent']
-    df_parent = df_parent.copy()
-    df_parent['r_group'] = df_parent['RN'].apply(lambda x: '.'.join(x.split('.')[0:3]))
-    df_parent = df_parent[['row_number', 'RN', 'Name', 'r_group', 'row_type', 'rule']]
-
-    for index, row in df_interfaces.iterrows():
-        int_rn  = row.RN + '.02.01'  # "interface milestone" line from the Interface LC block
-        int_idx = df_bp[(df_bp['RN'] == int_rn)]['row_number'].values[0]  # the index of the above
-
-        predecessor_list = []
-        for group in row.groups:
-            group  = group.strip()
-            p_list = df_parent[df_parent['r_group'] == group]['RN']  # all parents that belong to one dependent interface group
-            for parent in p_list:
-                df_x = df_bp[df_bp['parent'] == parent]
-                r = pd.Index(df_x).max()
-                predecessor_list.append(str(r[cn]))
-        df_bp.loc[int_idx, 'Predecessors'] = ','.join(sorted(predecessor_list))
     return df_bp
 
 def assign_to_major_ms():
@@ -445,9 +347,10 @@ def assign_pred_to_dev_lc():
             r_n = str(int(df_b2.get('row_number')))
             s_start = df_b2.get('Finish').values[0]
         except TypeError:
-            print(g)
+            # print('assign_pred_to_dev_lc: ', g)
+            continue
         df_bp.loc[df_x2.index, 'Predecessors'] = r_n
-        df_bp.loc[df_x2.index, 'Start'] = s_start
+        df_bp.loc[df_x2.index, 'Start']        = s_start
 
 def mark_milestone_complete():
     """ Sub Task Handler - if Sub Task Block is empty then mark as completed """
@@ -489,6 +392,23 @@ def mark_milestone_complete():
                 # df_bp.loc[r_n, CD]       = dt_max
 
 def epilog():
+    df_ems = df_bp[
+        (df_bp['row_type'].isin(['m4n-dl', 'm4n-ms'])) &
+        (df_bp['source'].notnull()) |
+        (df_bp['Task Mode'] == 'Manually Scheduled')
+        ]
+    for index, row in df_ems.iterrows():
+        dd = row.due_date
+        if row['Task Mode'] != 'Manually Scheduled':
+            dd = row.due_date.strftime('%d/%m/%Y')
+        df_bp.loc[index, 'Start']    = dd
+        df_bp.loc[index, 'Finish']   = dd
+        df_bp.loc[index, 'Duration'] = 0
+        df_bp.loc[index, 'isMS']     = 1
+        df_bp.loc[index, CD]         = dd
+        df_bp.loc[index, CT]         = config['constraint_type'].get('MFO')
+        df_bp.loc[index, 'source']   = row.source
+
     df_bp['isMS']     = df_bp['isMS'].fillna(0)
     df_bp['Work']     = df_bp['Work'].fillna(0)
     # df_bp['Duration'] = df_bp['Work']
@@ -510,13 +430,6 @@ def epilog():
 
 ''' Execution Order '''
 if __name__ == '__main__':
-    try:
-        db = ms.mongo_connect()
-    except Exception as e:
-        print('Oops! could not connect to the DB: ', e.__class__, 'occurred')
-        quit(-1)
-    print('mongo_db connected successfully')
-
     # pd.options.mode.chained_assignment = None
     # isinstance(row.due_date, pd._libs.tslibs.nattype.NaTType)
     # pd.bdate_range(start=start_d, end='20/10/2020', weekmask=weekmask, holidays=holidays, freq='C')
@@ -543,34 +456,30 @@ if __name__ == '__main__':
     start_s = time.time()
     dt = True if config['history'].get('date') > '27/12/2020' else False
     history = config['execution_params'].get('history')
-    if history:
-        print('History execution')
-        path = config['history'].get('path')
 
-        fn = os.path.join(path, config['history'].get('name'))
-        fr = os.path.join(path, config['history'].get('pmo'))
-        fo = os.path.join(path, config['history'].get('out'))
-        fs = os.path.join(path, config['history'].get('skeleton'))
-        fz = os.path.join(path, config['history'].get('consolidated'))
-    else:
-        path = config['config'].get('path')
-
-        fn = os.path.join(path, config['config'].get('name'))
-        fr = os.path.join(path, config['config'].get('pmo'))
-        fo = os.path.join(path, config['config'].get('out'))
-        fs = os.path.join(path, config['config'].get('skeleton'))
-        fz = os.path.join(path, config['config'].get('consolidated'))
-        bi = os.path.join(path, config['config'].get('p3BI'))
-        # f1 = os.path.join(path, config['config'].get('m4n'))
+    path = config['config'].get('path')
+    fn = os.path.join(path, config['config'].get('name'))
+    fr = os.path.join(path, config['config'].get('pmo'))
+    fo = os.path.join(path, config['config'].get('out'))
+    fs = os.path.join(path, config['config'].get('skeleton'))
+    fz = os.path.join(path, config['config'].get('consolidated'))
+    bi = os.path.join(path, config['config'].get('p3BI'))
+    f5 = config['config'].get('pdr-meeting')
 
     writer = pd.ExcelWriter(fo, engine='xlsxwriter')
     workbook = writer.book
 
-    df_dv      = pd.read_excel(fs, sheet_name='dev')  # logmar data inside the skeleton file
+    # df_dv      = pd.read_excel(fs, sheet_name='dev')  # logmar data inside the skeleton file
     df_bp      = pd.read_excel(fs, sheet_name='skeleton')
     df_rules_x = pd.read_excel(fr, sheet_name='Lines')
+    df_m4n     = pd.read_excel(f5, sheet_name='dl')
     df_bp['process'] = df_bp['process_id'].apply(lambda x: x.split(':')[0] if isinstance(x, str) else None)
     df_bp['domain']  = df_bp['domain_id'].apply(lambda x: x.split(':')[0] if isinstance(x, str) else None)
+
+    skeleton_map = df_bp.copy()
+    skeleton_map = skeleton_map[['RN', 'Start', 'Finish', pc]]
+    skeleton_map.set_index('RN', inplace=True)
+    skeleton_map = skeleton_map.to_dict()
 
     del df_bp['Unnamed: 0']
 
@@ -581,88 +490,81 @@ if __name__ == '__main__':
 
     # 2. write consolidated file of all inputs
     df_bp = write_consolidated()
-    print('{:50}:'.format('02. write consolidated file of all inputs'))
+    # print('{:50}:'.format('02. write consolidated file of all inputs'))
 
     # 3. create parent list
     parent_list = df_bp['parent'].unique()
     parent_list = [x for x in parent_list if str(x) != 'nan']
-    print('{:50}: {}'.format('03. create parent list', f'{len(parent_list):0>5}'))
+    print('{:50}: {}'.format('02. create parent list', f'{len(parent_list):0>5}'))
 
     # 4. sorting by RN
     df_bp.sort_values(by=['RN'], inplace=True)
     df_bp.index         = np.arange(1, len(df_bp) + 1)
     df_bp['row_number'] = df_bp.index
-    print('{:50}:'.format('04. sorting by Requirement Number'))
+    # print('{:50}:'.format('04. sorting by Requirement Number'))
 
     # 5. Update Life Cycle and MoM blocks
     start      = time.time()
-    # df_bp[percent_complete] = df_bp['status'].apply(lambda xz: 1.0 if xz in config['step'].get('completed') else 0)
     df_bp['Finish'] = None
     df_bp = update_lc_block()
     df_bp = update_mom_block()
-    print('{:50}: {:05.2f}'.format('05. Update Life Cycle and MoM blocks', time.time() - start))
+    print('{:50}: {:05.2f}'.format('03. Update Life Cycle and MoM blocks', time.time() - start))
 
     df_bp.sort_values(by=['RN'], inplace=True)
     df_bp.index         = np.arange(1, len(df_bp) + 1)
     df_bp['row_number'] = df_bp.index
 
     # 5a. Predecessor Handler
-    start      = time.time()
+    start = time.time()
     df_bp = df_bp.copy()
     df_bp = logmar_handler()
-    print('{:50}: {:05.2f}'.format('5a. Logmar Handler', time.time() - start))
+    print('{:50}: {:05.2f}'.format('04. Logmar Handler', time.time() - start))
 
     # 6. Predecessor Handler
     start      = time.time()
     df_bp = predecessor_handler()
-    print('{:50}: {:05.2f}'.format('06. Predecessor Handler', time.time() - start))
-
-    # 6a. M4N Successor Handler
-    start      = time.time()
-    df_bp = m4n_deliverables_as_successors()
-    print('{:50}: {:05.2f}'.format('6a. M4N Successor Handler', time.time() - start))
-
-    # 7. Interface Handler
-    start      = time.time()
-    # df_bp = update_interfaces()
-    print('{:50}: {:05.2f}'.format('07. Interface Handler', time.time() - start))
+    print('{:50}: {:05.2f}'.format('05. Predecessor Handler', time.time() - start))
 
     start      = time.time()
-    print('{:50}:'.format('08. Assign tasks to Major Milestones'))
     assign_to_major_ms()
     assign_pred_to_dev_lc()
+    print('{:50}: {:05.2f}'.format('06. Assign tasks to Major Milestones', time.time() - start))
 
     # 9. Mark Milestones as Completed as per all of its predecessors
-    print('{:50}:'.format('09. Mark completed milestones'))
+    start      = time.time()
     mark_milestone_complete()
+    print('{:50}: {:05.2f}'.format('07. Mark completed milestones', time.time() - start))
 
     # 10. Epilog Handler
-    print('{:50}:'.format('10. Epilog Handler, mark completed milestones'))
+    start      = time.time()
     epilog()
+    print('{:50}: {:05.2f}'.format('08. Epilog Handler, mark completed milestones', time.time() - start))
 
-    print('{:50}: {:05.2f}'.format('10. majorMS and epilog', time.time() - start))
     print(125*'=')
     print('{:50}: {:05.2f}'.format('execution time', time.time() - start_s))
-    start      = time.time()
 
+    start      = time.time()
     df_notes = df_bp[['RN', 'task_notes', 'task_notes_2']]
 
     df_notes.to_excel(writer, sheet_name='task_notes')
-    df_bp.to_excel(writer, sheet_name='Sheet1')
+    df_bp.to_excel   (writer, sheet_name='Sheet1')
 
     df_bp['RN'] = df_bp['RN'].astype(str)
-    df_bp[OL] = df_bp['RN'].apply(lambda x: len(x.split('.')))
-    mask = df_bp['row_type'].apply(lambda x: x not in ['header', 'm4n-dl', 'm4n-ms'])
+    df_bp[OL]   = df_bp['RN'].apply(lambda x: len(x.split('.')))
+    mask        = df_bp['row_type'].apply(lambda x: x not in ['header', 'm4n-dl', 'm4n-ms'])
     df_bp = df_bp.copy()
     df_bp.loc[mask, OL] = df_bp.loc[mask, OL] + 1
 
     df_bp['source'] = df_bp['source'].astype(str)
     df_bp = df_bp.rename(columns=config['dfP'])
     df_bp = df_bp[config['dfP_columns']]
+    print('{:50}: {:05.2f}'.format('final preparations', time.time() - start))
 
+    start      = time.time()
     df_bp.to_excel(writer, sheet_name='Task_Table1')
     worksheet = writer.sheets['Task_Table1']
     writer.save()
     print('{:50}: {:05.2f}'.format('writing p3-out.xlsx file', time.time() - start))
     print('{:50}: {:05.2f}'.format('execution elapse time', time.time() - start_s))
+
 
