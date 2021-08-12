@@ -20,11 +20,25 @@ print(125 * '=')
 with codecs.open('config.yaml', 'r', encoding='utf-8') as f:
     config = yaml.safe_load(f)
 
+d_gantt = config['dates'].get('gantt')
+d_int_1 = config['dates'].get('int_1')
+d_int_2 = config['dates'].get('int_2')
+
+pc       = '% Complete'
 holidays = []
 for d in config['bdays'].get('holidays'):
     holidays.append(pd.to_datetime(d))
 weekmask   = config['bdays'].get('bdays')
 custombday = pd.offsets.CustomBusinessDay(weekmask=weekmask, holidays=holidays)
+
+x = px.colors.qualitative.Pastel
+c_sequence = [
+    'rgb(102, 197, 204, 0.1)',
+    'rgb(246, 207, 113, 0.1)',
+    'rgb(248, 156, 116, 0.1)',
+    'rgb(220, 176, 242, 0.1)',
+    'rgb(135, 197, 95, 0.1)'
+]
 
 holidays = pd.to_datetime(config['holidays'])
 (MON, TUE, WED, THU, FRI, SAT, SUN) = range(7)
@@ -35,9 +49,11 @@ fn = os.path.join(path, config['config'].get('gantt'))
 f1 = os.path.join(path, config['config'].get('pmo'))
 f2 = os.path.join(path, config['config'].get('name'))
 f3 = os.path.join(path, config['config'].get('p3BI'))
+f4 = os.path.join(path, '_in/motd.xlsx')
 
 
 today    = pd.to_datetime('today')
+today_mm = today.strftime('%Y-%m')
 deadline = pd.to_datetime('2020/10/31', format='%Y/%m/%d')
 x_start  = pd.to_datetime('2020/08/01', format='%Y/%m/%d')
 
@@ -48,18 +64,41 @@ df    = pd.read_excel(fn, sheet_name='gantt-data')
 df_int= pd.read_excel(fn, sheet_name='int')
 df_ct = pd.read_excel(fn, sheet_name='completed')
 df_rd = pd.read_excel(fn, sheet_name='raw-dev')
-df_sf = pd.read_excel(fn, sheet_name='shafir')
-df_dl = pd.read_excel(fn, sheet_name='deliverables')
 df_bm = pd.read_excel(fn, sheet_name='bl-month')
 df_gt = pd.read_excel(fn, sheet_name='g-totals')
 df_evm= pd.read_excel(fn, sheet_name='EVM')
 df_pr = pd.read_excel(f2, sheet_name='process_ref')
 df_bi = pd.read_excel(f3, sheet_name='Task_Table1')
+motd  = pd.read_excel(f4, sheet_name='Sheet2')
 
-df_dl.sort_values(['RN'], ascending=False, inplace=True)
+df_rd = df_rd.rename(columns={'Finish_Date': 'Finish'})
+
+# df_dl.sort_values(['RN'], ascending=False, inplace=True)
 df_mj = pd.read_excel(f1, sheet_name='major')
 df_pr = df_pr[['domain_id', 'process_id']]
 domains = df_pr['domain_id'].unique()
+
+""" Closed Requirements """
+df_closed = df_rd[( df_rd['month'] <= today_mm ) & ( df_rd[pc] == 1 )]
+df_closed = df_closed.copy()
+df_closed = df_closed[['value', 'Name', 'process_id', 'xRN', 'RN']]
+""" Finish Closed Requirements """
+
+""" Open Requirements """
+df_open = df_rd[( df_rd['month'] <= today_mm ) & ( df_rd[pc] < 1 )]
+df_open = df_open.copy()
+df_open = df_open[['old_budget', 'Name', 'process_id', 'xRN', 'RN']]
+""" Finish Open Requirements """
+
+closed_text1 = '{} דרישות סגורות'.format(df_gt['YTD_Closed'].values[0])
+closed_text  ='במשקל {:,} נקודות'.format(int(df_closed['value'].sum()))
+
+open_text1   = '{} דרישות פתוחות'.format(df_gt['YTD_Open'].values[0])
+open_text    ='במשקל {:,} נקודות'.format(int(df_open['old_budget'].sum()))
+
+df_closed['value'] = df_closed['value'].apply(lambda x: f'{x:.2f}')
+df_open['value']   = df_open['old_budget'].apply(lambda x: f'{x:.2f}')
+df_open = df_open[['value', 'Name', 'process_id', 'xRN', 'RN']]
 
 process_dict = {'select all...': ['select all...']}
 for x_key in domains:
@@ -69,24 +108,48 @@ for x_key in domains:
 rules = df_rd['rule'].unique()
 rules_dict = [{'label': i, 'value': i} for i in rules]
 
+line_1 = motd.loc[0, 'text']
+line_2 = motd.loc[1, 'text']
+
+def annotation_style_position(figure=go.Figure(), text=str, x_position=float):
+    figure.add_annotation(
+        yref        =  'paper',
+        text        =  text,
+        x           =  x_position,
+        y           =  0.95,
+        showarrow   =  True,
+        align       =  'center',
+        arrowhead   =  2,
+        arrowsize   =  1,
+        arrowcolor  =  '#636363',
+        ax          =  70,
+        ay          =  -30,
+        bordercolor =  '#c7c7c7',
+        borderwidth =  2,
+        borderpad   =  4,
+        bgcolor     =  '#ff7f0e',
+        opacity     =  0.8
+    )
+    return figure
+
 def home_page():
     layout = dbc.Container([
         dbc.Row([
             dbc.Col(
                 dbc.Jumbotron([
                     html.H1('מסר השבוע', className='display-3'),
-                    html.P(
-                        'מסר מספר אחד'
-                        ' -- מספר מספר שניים'
-                    ),
+                    dbc.Alert(line_1, color='#325d88', style={'font-size': 28}),
                     html.Hr(),
-                    html.P(
-                        'מסר נוסף'
-                    ),
+                    dbc.Alert(line_2, color='secondary', style={'font-size': 18}),
                 ]),
                 style={
                     'textAlign' : 'center',
                 }, width=12
+            ),
+        ]),
+        dbc.Row([
+            dbc.Col(
+               dcc.Graph(id='bullet_chart', figure=f_bullet), width=12
             ),
         ]),
         html.Hr(),
@@ -98,6 +161,75 @@ def home_page():
                 dcc.Graph(id='evm-figure', figure=f_spi), width=4
             )
         ]),
+        html.Hr(),
+        dbc.Row([
+            dbc.Col(
+                dbc.Card(
+                    dbc.CardBody([
+                        html.H5(closed_text1, className="card-title",
+                                        style={'textAlign': 'center', 'font-size': 48}),
+                        html.P(closed_text,
+                               style={'textAlign': 'center', 'font-size': 24, 'color': 'Yellow'}),
+                        html.P('עד לסוף חודש זה', style={'textAlign': 'center', 'font-size': 18, 'color': 'Yellow'}),
+                        dbc.Button('פירוט דרישות', id="open-closed-table", size='lg',
+                                   color='secondary', outline=False,
+                                   block=False),
+                    ]), color='#325d88', inverse=True
+                ), width={'size': 3, 'offset': 0}
+            ),
+            dbc.Col(
+                dbc.Card(
+                    dbc.CardBody([
+                        html.H5(open_text1, className="card-title",
+                                style={'textAlign': 'center', 'font-size': 48}),
+                        html.P(open_text,
+                               style={'textAlign': 'center', 'font-size': 24, 'color': 'Yellow'}),
+                        html.P('עד לסוף חודש זה', style={'textAlign': 'center', 'font-size': 18, 'color': 'Yellow'}),
+                        dbc.Button('פירוט דרישות', id="open-open-table", size='lg',
+                                   color='secondary', outline=False,
+                                   block=False),
+                    ]), color='#325d88', inverse=True
+                ), width={'size': 3, 'offset': 6}
+            ),
+        ]),
+        dbc.Modal([
+            dbc.ModalBody(
+                dt.DataTable(
+                    data=df_closed.to_dict('records'),
+                    columns=[{'name': i, 'id': i, 'deletable': False} for i in df_closed.columns if i != 'id'],
+                    style_cell=style_cell,
+                    style_header=style_header,
+                    filter_action='native',
+                    sort_action='native',
+                    sort_mode='single',
+                    page_action='native',
+                    page_current=0,
+                    page_size=20
+                )
+            ),
+            dbc.ModalFooter(
+                dbc.Button('סגור', id='close-closed-xl', className='ml-auto')
+            )
+        ], id='modal-closed-table', size='xl', fade=True),
+        dbc.Modal([
+            dbc.ModalBody(
+                dt.DataTable(
+                    data=df_open.to_dict('records'),
+                    columns=[{'name': i, 'id': i, 'deletable': False} for i in df_open.columns if i != 'id'],
+                    style_cell=style_cell,
+                    style_header=style_header,
+                    filter_action='native',
+                    sort_action='native',
+                    sort_mode='single',
+                    page_action='native',
+                    page_current=0,
+                    page_size=20
+                )
+            ),
+            dbc.ModalFooter(
+                dbc.Button('סגור', id='close-open-xl', className='ml-auto')
+            )
+        ], id='modal-open-table', size='xl', fade=True),
         html.Hr(),
         dbc.Row([
             dbc.Col(
@@ -180,14 +312,6 @@ def page_1():
             dbc.Col(width=1),
             dbc.Col(
                 dcc.Graph(id='mta-figure', figure=f_mta), width=10
-            ),
-            dbc.Col(width=1),
-        ]),
-        html.Hr(),
-        dbc.Row([
-            dbc.Col(width=1),
-            dbc.Col(
-                dcc.Graph(id='deliverables-chart', figure=f_dl), width=10
             ),
             dbc.Col(width=1),
         ]),
@@ -323,8 +447,160 @@ def home_page_filter_data(selected_domain=str, selected_process=str, selected_ru
     fig = marimekko_chart(df_dev=dfr.copy())
     return selected_str, fig, dfr.to_dict('records'), selected_rule
 
+def display_bullet_chart():
+    target = df_gt['target'].values[0] * 100
+    actual = df_gt['actual'].values[0] * 100
+    fig = go.Figure(
+        go.Indicator(
+            # mode='number+gauge+delta',
+            mode='gauge',
+            value=actual,
+            delta={
+                'reference': target,
+                'position': 'top',
+            },
+            gauge={
+                'shape': 'bullet',
+                'axis': {'range': [0, 100]},
+                'threshold': {
+                    'line': {
+                        'color': 'crimson',
+                        'width': 8
+                    },
+                    'thickness': 1,
+                    'value': target
+                },
+                'bgcolor': 'white',
+                'steps': [
+                    {'range': [0, target-12],      'color': '#f74205'},
+                    {'range': [target-12, target], 'color': 'lightsalmon'},
+                    {'range': [target, 100],       'color': '#325d88'}
+                ],
+                'bar': {'color': 'MidNightBlue'}
+            }
+        ),
+    )
+
+    # fig = annotation_style_position(figure=fig, text='נקודת המטרה', x_position=target/100 - 0.10)
+    t_text = ' {:.1f}% <= {:.1f}%  מול יעד של {:.1f}% :ההתקדמות בפועל'.format(( actual/target ) * 100, actual, target)
+    fig.update_layout(
+        height=250,
+        title={
+            'text'    : t_text,
+            'y'       : 0.95,
+            'x'       : 0.5,
+            'xanchor' : 'center',
+            'yanchor' : 'top'
+        },
+        title_font_family='Times New Roman',
+        title_font_color='#0047ab',
+        title_font_size=36,
+        paper_bgcolor='#f8f5f0',   # f8f5f0',
+        plot_bgcolor='#c7d6cb',
+    )
+    fig.update_xaxes(
+        tickfont=dict(
+            family='Arial',
+            color='crimson',
+            size=14
+        )
+    )
+    return fig
+
+def display_evm():
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=df_evm['month'],
+            y=df_evm['budget-cumsum'],
+            mode='lines+markers',
+            name='תכנון תפוקות',
+            hovertemplate='<i>plan</i>: %{y}'
+        )
+    )
+    fig.add_trace(
+        go.Scatter(
+            x=df_evm['month'],
+            y=df_evm['ytd-value'],
+            mode='lines+markers',
+            name='תפוקה בפועל',
+            hovertemplate='<i>actual</i>: %{y}'
+        )
+    )
+    fig.update_layout(
+        title={
+            'text'    : 'גרף תפוקות',
+            'y'       : 0.95,
+            'x'       : 0.5,
+            'xanchor' : 'center',
+            'yanchor' : 'top'
+        },
+        title_font_size=36,
+        # xaxis_title='תאריך דיווח',
+        # yaxis_title='תאריכי אבני הדרך',
+        font=dict(
+            family='Times Roman',
+            size=14,
+            color="RebeccaPurple"
+        ),
+        height = 400,
+        paper_bgcolor = '#f8f5f0',
+        plot_bgcolor = '#c7d6cb'
+    )
+    fig.update_xaxes(rangemode='tozero')
+    fig.update_yaxes(rangemode='tozero')
+    return fig
+
+def display_spi():
+    fig = go.Figure(
+        go.Indicator(
+            # mode = 'gauge+number+delta',
+            mode = 'gauge+number',
+            # value = df_gt['SPI'].values[0],
+            value = float('{:.2f}'.format(df_gt['SPI'].values[0])),
+            domain = {'x': [0, 1], 'y': [0, 1]},
+            # title = {'text': 'מדד תפוקות', 'font': {'size': 24}},
+            delta = {'reference': 1.0, 'increasing': {'color': 'RebeccaPurple'}},
+            gauge = {
+                'axis': {'range': [None, 1], 'tickwidth': 1, 'tickcolor': 'darkblue'},
+                'bar': {'color': 'darkblue'},
+                'bgcolor': 'white',
+                'borderwidth': 2,
+                'bordercolor': 'gray',
+                'steps': [
+                    {'range': [0.0, 0.6], 'color': 'crimson'},
+                    {'range': [0.6, 0.8], 'color': 'yellow'},
+                    {'range': [0.8, 1.0], 'color': 'green'}
+                ],
+            }
+        )
+    )
+
+    fig.update_layout(
+        title={
+            'text'    : 'מדד תפוקות',
+            'y'       : 0.95,
+            'x'       : 0.5,
+            'xanchor' : 'center',
+            'yanchor' : 'top'
+        },
+        title_font_size=36,
+        # xaxis_title='תאריך דיווח',
+        # yaxis_title='תאריכי אבני הדרך',
+        font=dict(
+            family='Times Roman',
+            size=14,
+            color="RebeccaPurple"
+        ),
+        height = 400,
+        # paper_bgcolor = '#9ab3a0',
+        paper_bgcolor = '#f8f5f0',
+        plot_bgcolor = '#c7d6cb'
+    )
+    return fig
+
 def marimekko_chart(df_dev=pd.DataFrame):
-    df_dev['month'] = pd.to_datetime(df_dev['Finish_Date']).dt.strftime('%Y-%m')
+    df_dev['month'] = pd.to_datetime(df_dev['Finish']).dt.strftime('%Y-%m')
     df_dev.sort_values('month', inplace=True)
     df_g = df_dev.groupby(['month']).agg({
         'RN'       : 'size',
@@ -357,11 +633,11 @@ def marimekko_chart(df_dev=pd.DataFrame):
         'open'    : 'crimson'
     }
 
-    c_map = df_sf[['C_MS', 'month', 'y']]
-    c_map.set_index('month', inplace=True)
-    c_map = c_map.to_dict()
-    df_g['c-ms'] = df_g.month.map(c_map.get('C_MS'))
-    df_g['c-y'] = df_g.month.map(c_map.get('y'))
+    # c_map = df_sf[['C_MS', 'month', 'y']]
+    # c_map.set_index('month', inplace=True)
+    # c_map = c_map.to_dict()
+    # df_g['c-ms'] = df_g.month.map(c_map.get('C_MS'))
+    # df_g['c-y'] = df_g.month.map(c_map.get('y'))
     df_g['cumsum'] = df_g['width'].cumsum()
     df_g['cumsum'] = df_g['cumsum'].shift(1)
     df_g.loc[0, 'cumsum'] = 0
@@ -372,11 +648,11 @@ def marimekko_chart(df_dev=pd.DataFrame):
     x1_rect = df_g['month'].max()
     rect = True
 
-    df_ms = df_g[df_g['c-ms'].notnull()]
+#    df_ms = df_g[df_g['c-ms'].notnull()]
     try:
         x0_vrect = df_g[df_g['month'] == x0_rect]['cumsum'].values[0]
         x1_vrect = df_g[df_g['month'] == x1_rect]['cumsum'].values[0] + df_g[df_g['month'] == x1_rect]['width'].values[0]
-        x_vline = df_ms[df_ms['c-ms'] == 'INTEG']['cumsum'].values[0]
+#        x_vline = df_ms[df_ms['c-ms'] == 'INTEG']['cumsum'].values[0]
     except IndexError:
         rect = False
 
@@ -396,12 +672,6 @@ def marimekko_chart(df_dev=pd.DataFrame):
     marimekko_data_map = df_g.copy()
     marimekko_data_map.set_index('month', inplace=True)
     marimekko_data_map = marimekko_data_map.to_dict()
-
-    shafir = True
-    try:
-        df_sf['x'] = df_sf['month'].map(marimekko_data_map.get('cumsum'))
-    except IndexError:
-        shafir = False
 
     fig = go.Figure()
     for key in data:
@@ -448,12 +718,12 @@ def marimekko_chart(df_dev=pd.DataFrame):
             layer='above',
             line_width=0
         )
-        fig.add_vline(
-            x=x_vline,
-            line_width=3,
-            line_dash='dash',
-            line_color='green'
-        )
+#         fig.add_vline(
+#             x=x_vline,
+#             line_width=3,
+#             line_dash='dash',
+#             line_color='green'
+#         )
 
     annotations.append(dict(
         xref='paper',
@@ -488,6 +758,7 @@ def marimekko_chart(df_dev=pd.DataFrame):
         xaxis={'categoryorder': 'category ascending'},
         xaxis_tickangle=-45,
         height=600,
+        title=config['style_title']
         # annotations=annotations
     )
     return fig
@@ -495,7 +766,7 @@ def marimekko_chart(df_dev=pd.DataFrame):
 def gantt_page_filter_data(selected_rule=str):
     df_gantt        = df.copy()
     df_completed    = df_ct.copy()
-    df_deliverables = df_dl.copy()
+    df_deliverables = pd.DataFrame()
     if selected_rule  == 'INT':
         fig = gantt_int()
     else:
@@ -515,8 +786,8 @@ def gantt_int():
             'Start_Date' : True,
             'Finish_Date': True
         },
-        color_discrete_map={'Dev': 'rgb(246, 207, 113)'},
-        title='Gantt Report: ' + today.strftime('%d/%m/%Y'),
+        color_discrete_map={'INT': 'rgb(246, 207, 113)'},
+        title='Gantt Report: ' + d_gantt,
         range_x=[pd.to_datetime('20201130'), pd.to_datetime('20221231')]
     )
 
@@ -525,57 +796,30 @@ def gantt_int():
             '<b>%{hovertext}</b><br>start =  %{customdata[1]|%d/%m/%Y}<br>finish= %{x|%d/%m/%Y}<extra></extra>'
 
     """ DEADLINE """
-    dead_line = pd.to_datetime('15/04/2022', format='%d/%m/%Y')
+    dead_line = pd.to_datetime(d_int_1,   format='%d/%m/%Y')
+    second_line = pd.to_datetime(d_int_2, format='%d/%m/%Y')
+    fig.add_vline(
+        x=today,
+        line_width=2,
+        line_dash='dot',
+        line_color='green',
+    )
     fig.add_vline(
         x=dead_line,
         line_width=2,
         line_dash='dot',
         line_color='blue'
     )
-    fig.add_annotation(
-        yref='paper',
-        text='נקודת אינטגרציה',
-        x=dead_line,
-        y=0.95,
-        showarrow=True,
-        align='center',
-        arrowhead=2,
-        arrowsize=1,
-        arrowcolor='#636363',
-        ax=70,
-        ay=-30,
-        bordercolor='#c7c7c7',
-        borderwidth=2,
-        borderpad=4,
-        bgcolor='#ff7f0e',
-        opacity=0.8
-    )
-    """ Made4Net """
-    m4n =  pd.to_datetime('30/08/2021', format='%d/%m/%Y')
     fig.add_vline(
-        x=m4n,
+        x=second_line,
         line_width=2,
         line_dash='dot',
         line_color='blue'
     )
-    fig.add_annotation(
-        yref='paper',
-        text='M4N - CDR/INT',
-        x=m4n,
-        y=0.95,
-        showarrow=True,
-        align='center',
-        arrowhead=2,
-        arrowsize=1,
-        arrowcolor='#636363',
-        ax=70,
-        ay=-30,
-        bordercolor='#c7c7c7',
-        borderwidth=2,
-        borderpad=4,
-        bgcolor='#ff7f0e',
-        opacity=0.8
-    )
+
+    fig = annotation_style_position(figure=fig, text='היום',                 x_position=today)
+    fig = annotation_style_position(figure=fig, text='נקודת אינטגרציה',      x_position=dead_line)
+    fig = annotation_style_position(figure=fig, text='נקודת אינטגרציה שניה', x_position=second_line)
 
     fig.add_scatter(                   # progress marker
         y=df_int['process_id'],
@@ -606,7 +850,7 @@ def gantt_int():
             size=14,
             color="RebeccaPurple"
         ),
-        paper_bgcolor='#e1e1e1',
+        paper_bgcolor='#f8f5f0',
         plot_bgcolor='#c7d6cb',
         height=950,
         xaxis = dict(autorange='reversed'),
@@ -616,7 +860,8 @@ def gantt_int():
             y=0.99,
             xanchor='left',
             x=0.01
-        )
+        ),
+        title=config['style_title']
     )
     return fig
 
@@ -632,8 +877,8 @@ def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
         color_discrete_sequence=px.colors.qualitative.Pastel,
         hover_name='process_id',
         hover_data=['m_task', 'start', 'finish'],
-        title='Gantt Report: ' + today.strftime('%d/%m/%Y'),
-        category_orders={'m_task': ['BP', 'Dev', 'Test', 'Prod']},
+        title='Gantt Report: ' + d_gantt,
+        category_orders={'m_task': ['BP', 'SAP', 'INT', 'Test', 'Prod']},
         range_x=[pd.to_datetime('20201130'), pd.to_datetime('20221231')],
     )
     for ser in fig['data']:
@@ -641,56 +886,30 @@ def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
         # ser['customdata'][:, 1] = c
         ser['hovertemplate'] = '<b>%{hovertext}</b><br><br>step  = %{customdata[0]}<br>start  = %{customdata[1]}<br>finish = %{x|%d/%m/%Y}<extra></extra>'
 
+    dead_line = pd.to_datetime(d_int_1,   format='%d/%m/%Y')
+    second_line = pd.to_datetime(d_int_2, format='%d/%m/%Y')
     fig.add_vline(
         x=today,
         line_width=2,
         line_dash='dot',
         line_color='green',
     )
-    fig.add_annotation(
-        yref='paper',
-        text='היום',
-        x=today,
-        y=0.95,
-        showarrow=True,
-        align='center',
-        arrowhead=2,
-        arrowsize=1,
-        arrowcolor='#636363',
-        ax=25,
-        ay=-30,
-        bordercolor='#c7c7c7',
-        borderwidth=2,
-        borderpad=4,
-        bgcolor='#ff7f0e',
-        opacity=0.8
-    )
-
-    dead_line = pd.to_datetime('15/04/2022', format='%d/%m/%Y')
     fig.add_vline(
         x=dead_line,
         line_width=2,
         line_dash='dot',
         line_color='blue'
     )
-    fig.add_annotation(
-        yref='paper',
-        text='נקודת אינטגרציה',
-        x=dead_line,
-        y=0.95,
-        showarrow=True,
-        align='center',
-        arrowhead=2,
-        arrowsize=1,
-        arrowcolor='#636363',
-        ax=70,
-        ay=-30,
-        bordercolor='#c7c7c7',
-        borderwidth=2,
-        borderpad=4,
-        bgcolor='#ff7f0e',
-        opacity=0.8
+    fig.add_vline(
+        x=second_line,
+        line_width=2,
+        line_dash='dot',
+        line_color='blue'
     )
+
+    fig = annotation_style_position(figure=fig, text='היום',                 x_position=today)
+    fig = annotation_style_position(figure=fig, text='נקודת אינטגרציה',      x_position=dead_line)
+    fig = annotation_style_position(figure=fig, text='נקודת אינטגרציה שניה', x_position=second_line)
 
     df2.reset_index(inplace=True)
     fig.add_scatter(                   # progress marker
@@ -699,9 +918,24 @@ def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
         name='progress',
         mode='markers+text',
         marker={'size': 8, 'symbol': 'square', 'color': 'black'},
-        hovertemplate='<b>%{text}</b>',
         text=['{:.0%}'.format(df2.logmar_pc[i]) for i in range(len(df2))],
+        hovertemplate='<b>%{text}</b>',
         textposition='top center',
+        showlegend=True
+    )
+    fig.add_scatter(                   # Dev Finish Date
+        y=df2['process_id'],
+        x=df2['dev_fd'],
+        name='סיום סאפ',
+        mode='markers',
+        marker={'size': 8, 'symbol': 'diamond', 'color': 'rgb(246, 207, 113)', 'line': {'color': 'MediumPurple', 'width': 1}},
+        text=[df2.dev_fd[i].strftime('%d/%m/%Y') for i in range(len(df2))],
+        hovertemplate='%{text}',
+        textposition='bottom center',
+        textfont=dict(
+            # color='rgb(246, 207, 113)',
+            color='rgb(138, 109, 39)',
+        ),
         showlegend=True
     )
 
@@ -717,10 +951,10 @@ def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
         progress_line['y1'] = y_size - i      #   df2.process_id[i]
         fig.add_shape(progress_line, name='progress')
 
-        history_line['x0'] = progress_line['x0']   # df2.Start_Date[i]
-        history_line['x1'] = df2['bl-finish'][i]
-        history_line['y0'] = y_size - i - 0.35
-        history_line['y1'] = y_size - i - 0.35
+        # history_line['x0'] = progress_line['x0']   # df2.Start_Date[i]
+        # history_line['x1'] = df2['bl-finish'][i]
+        # history_line['y0'] = y_size - i - 0.35
+        # history_line['y1'] = y_size - i - 0.35
         # fig.add_shape(history_line, yref='y')
         df2['y_size'] = y_size - i
 
@@ -760,27 +994,29 @@ def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
         )
     ))
     """
-
     fig.update_layout(
         xaxis_title='תאריך',
         yaxis_title='תהליכים',
         font=dict(
-            family='Courier New, monospace',
+            family='Courier New, bold',
             size=14,
             color="RebeccaPurple"
         ),
-        paper_bgcolor='#e1e1e1',
+        paper_bgcolor='#f8f5f0',
         plot_bgcolor='#c7d6cb',
         height=1200,
         xaxis=dict(autorange='reversed'),
         yaxis=dict(side='right'),
         legend=dict(
             yanchor='top',
-            y=0.99,
+            y=1.00,
             xanchor='left',
-            x=0.01
-        )
+            x=-0.07
+        ),
+        title=config['style_title']
     )
+    fig.data[1]['marker']['opacity'] = 1.0
+    fig.data[2]['marker']['opacity'] = 0.62
     return fig
 
 def gantt_contract():
@@ -795,7 +1031,7 @@ def gantt_contract():
         color='task',
         color_discrete_sequence=px.colors.qualitative.Pastel,
         text='<b>' + dff['task'] + ': ' + dff['finish'].dt.strftime('%d/%m/%Y') + '</b>' + '<br>' + dff['months'] + ' :משך',
-        title='Gantt Report: 22/07/2021',
+        title='Gantt Report: ' + d_gantt,
         category_orders={
             'task': ['SRR', 'PDR', 'CDR', 'INTEG']
         },
@@ -804,7 +1040,7 @@ def gantt_contract():
             'task' : False,
         },
         height=500,
-        # range_x=[pd.to_datetime('20201130'), pd.to_datetime('20221231')]
+        range_x=[pd.to_datetime('20221231', format='%Y%m%d'), pd.to_datetime('20201130', format='%Y%m%d')]
     )
 
     v_df = df_mj[['vline', 'vline_text', 'ax']]
@@ -895,7 +1131,7 @@ def gantt_contract():
             size=18,
             color="RebeccaPurple",
         ),
-        paper_bgcolor = '#e1e1e1',
+        paper_bgcolor = '#f8f5f0',
         plot_bgcolor = '#c7d6cb',
         bargap=0.01,
         xaxis=dict(autorange='reversed'),
@@ -905,7 +1141,8 @@ def gantt_contract():
             y=0.99,
             xanchor='left',
             x=-0.15
-        )
+        ),
+        title=config['style_title']
     )
     return fig
 
@@ -938,7 +1175,7 @@ def gantt_status_row():
                             'color'    : '#EADB5A',
                             'font-size': 48,
                         })
-                ]), color="secondary", inverse=True
+                ]), color="#325d88", inverse=True
             ), width={'size': 2, 'offset': 0}
         ),
         dbc.Col(
@@ -961,7 +1198,7 @@ def gantt_status_row():
                             'font-size': 48
                         }
                     )
-                ]), color="secondary", inverse=True
+                ]), color="#325d88", inverse=True
             ), width={'size': 2, 'offset': 0}
         ),
         dbc.Col(
@@ -984,7 +1221,7 @@ def gantt_status_row():
                             'font-size': 48
                         }
                     )
-                ]), color="secondary", inverse=True
+                ]), color="#325d88", inverse=True
             ), width={'size': 2, 'offset': 0}
         ),
         dbc.Col(
@@ -1007,7 +1244,7 @@ def gantt_status_row():
                             'font-size': 48
                         }
                     )
-                ]), color="secondary", inverse=True
+                ]), color="#325d88", inverse=True
             ), width={'size': 2, 'offset': 0}
         ),
         dbc.Col(
@@ -1030,7 +1267,7 @@ def gantt_status_row():
                             'font-size': 48
                         }
                     )
-                ]), color="secondary", inverse=True
+                ]), color="#325d88", inverse=True
             ), width={'size': 2, 'offset': 0}
         ),
         dbc.Col(
@@ -1053,7 +1290,7 @@ def gantt_status_row():
                             'font-size': 48
                         }
                     )
-                ]), color="secondary", inverse=True
+                ]), color="#325d88", inverse=True
             ), width={'size': 2, 'offset': 0}
         ),
     ]
@@ -1099,7 +1336,7 @@ def mta_fig():
 
     fig.update_layout(
         height=600,
-        paper_bgcolor='#e1e1e1',
+        paper_bgcolor='#f8f5f0',
         plot_bgcolor='#c7d6cb'
     )
 
@@ -1125,7 +1362,7 @@ def display_requirements_table(dff=pd.DataFrame(), selected_month=str):
         selected_month = pd.to_datetime(selected_month, format='%b-%Y')
         mn = selected_month.month
         yr = selected_month.year
-        dff['Finish_Date'] = pd.to_datetime(dff['Finish_Date'])
+        dff['Finish_Date'] = pd.to_datetime(dff['Finish'])
 
         mask_1 = dff['Finish_Date'].map(lambda x: x.month) == mn
         mask_2 = dff['Finish_Date'].map(lambda x: x.year)  == yr
@@ -1133,8 +1370,8 @@ def display_requirements_table(dff=pd.DataFrame(), selected_month=str):
         dff = dff[mask_1 & mask_2]
 
     df_tmp = dff.copy()
-    df_tmp = df_tmp[['pc', 'Finish_Date', 'p_name', 'parent', 'xRN', 'process_id', 'domain_id']]
-    df_tmp['Finish_Date'] = pd.to_datetime(df_tmp['Finish_Date']).dt.strftime('%d/%m/%Y')
+    df_tmp = df_tmp[[pc, 'Finish', 'Name', 'RN', 'xRN', 'process_id', 'domain_id']]
+    df_tmp['Finish'] = pd.to_datetime(df_tmp['Finish']).dt.strftime('%d/%m/%Y')
     dff_table = dt.DataTable(
         data=df_tmp.to_dict('records'),
         columns=[{'name': i, 'id': i, 'deletable': False} for i in df_tmp.columns if i != 'id'],
@@ -1149,6 +1386,7 @@ def display_requirements_table(dff=pd.DataFrame(), selected_month=str):
     )
     return dff_table
 
+"""
 def display_deliverable():
     fig = go.Figure()
     fig.add_trace(go.Scatter(
@@ -1198,7 +1436,7 @@ def display_deliverable():
         )
     fig.update_layout(
         title_text='deliverables',
-        paper_bgcolor='#e1e1e1',
+        paper_bgcolor='#f8f5f0',
         plot_bgcolor='#f5faf6',
         height=1000,
         font = dict(
@@ -1208,89 +1446,7 @@ def display_deliverable():
         ),
     )
     return fig
-
-def display_evm():
-    #df_evm['budget_cumsum'] = df_evm['budget_cumsum'].apply(lambda x: f'{int(x):,d}' )
-    # df_evm['ev'] = df_evm['ev'].astype(int)
-    fig = go.Figure()
-    fig.add_trace(
-        go.Scatter(
-            x=df_evm['month'],
-            y=df_evm['budget_cumsum'],
-            mode='lines+markers',
-            name='תכנון תפוקות',
-            hovertemplate='<i>plan</i>: %{y}'
-        )
-    )
-    fig.add_trace(
-        go.Scatter(
-            x=df_evm['month'],
-            y=df_evm['ev'],
-            mode='lines+markers',
-            name='תפוקה בפועל',
-            hovertemplate='<i>actual</i>: %{y}'
-        )
-    )
-    fig.update_layout(
-        title='גרף תפוקות',
-        title_x=0.5,
-        # xaxis_title='תאריך דיווח',
-        # yaxis_title='תאריכי אבני הדרך',
-        font=dict(
-            family='Times Roman',
-            size=14,
-            color="RebeccaPurple"
-        ),
-        height = 400,
-        paper_bgcolor = '#e1e1e1',
-        plot_bgcolor = '#c7d6cb'
-    )
-    fig.update_xaxes(rangemode='tozero')
-    fig.update_yaxes(rangemode='tozero')
-    return fig
-
-def display_spi():
-    fig = go.Figure(
-        go.Indicator(
-            # mode = 'gauge+number+delta',
-            mode = 'gauge+number',
-            # value = df_gt['SPI'].values[0],
-            value = float('{:.2f}'.format(df_gt['SPI'].values[0])),
-            domain = {'x': [0, 1], 'y': [0, 1]},
-            # title = {'text': 'מדד תפוקות', 'font': {'size': 24}},
-            delta = {'reference': 1.0, 'increasing': {'color': 'RebeccaPurple'}},
-            gauge = {
-                'axis': {'range': [None, 1], 'tickwidth': 1, 'tickcolor': 'darkblue'},
-                'bar': {'color': 'darkblue'},
-                'bgcolor': 'white',
-                'borderwidth': 2,
-                'bordercolor': 'gray',
-                'steps': [
-                    {'range': [0.0, 0.6], 'color': 'crimson'},
-                    {'range': [0.6, 0.8], 'color': 'yellow'},
-                    {'range': [0.8, 1.0], 'color': 'green'}
-                ],
-            }
-        )
-    )
-
-    fig.update_layout(
-        title='מדד תפוקות',
-        title_x=0.5,
-        # xaxis_title='תאריך דיווח',
-        # yaxis_title='תאריכי אבני הדרך',
-        font=dict(
-            family='Times Roman',
-            size=14,
-            color="RebeccaPurple"
-        ),
-        height = 400,
-        # paper_bgcolor = '#9ab3a0',
-        paper_bgcolor = '#e1e1e1',
-        plot_bgcolor = '#c7d6cb'
-    )
-    return fig
-
+"""
 def app_navbar(app):
     navbar = dbc.Navbar(
         dbc.Container(
@@ -1355,11 +1511,12 @@ def app_navbar(app):
 
 f_mta     = mta_fig()
 f_major   = gantt_contract()
-f_dl      = display_deliverable()
+# f_dl      = display_deliverable()
 f_risk    = r_heatmap.risk_heatmap()
 f_stacked = r_stacked.r_stacked_fig()
 f_evm     = display_evm()
 f_spi     = display_spi()
+f_bullet  = display_bullet_chart()
 
 
 #     if shafir:

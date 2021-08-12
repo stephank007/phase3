@@ -1,3 +1,9 @@
+dates:
+  gantt:   11/08/2021
+  int_1:   30/04/2022
+  int_2:   30/08/2022
+  bl_date: 22/06/2021
+
 execution_params:
   publish : yes
   moria   : no
@@ -434,6 +440,7 @@ skeleton_columns:
   - waiting
   - status
   - BP
+  - Duration
   - '% Complete'
   - due_date
   - parent
@@ -681,3 +688,11 @@ style_header : {
   'fontWeight'     : 'bold',
   'font_size'      : '14px',
 }
+
+style_title: {
+  y : 0.95,
+  x : 0.5,
+  xanchor: 'center',
+  yanchor: 'top'
+}
+

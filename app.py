@@ -95,6 +95,29 @@ def requirements_status(selection, df_requirements, click, n_clicks):
 def gantt_rendition(rule):
     return ap.gantt_page_filter_data(rule)
 
+def toggle_modal(n1, n2, is_open):
+    if n1 or n2:
+        return not is_open
+    return is_open
+
+app.callback(
+    Output('modal-closed-table', 'is_open'),
+    [
+        Input('open-closed-table', 'n_clicks'),
+        Input('close-closed-xl',   'n_clicks')   # closing the modal window
+    ],
+    [State('modal-closed-table', 'is_open')],
+)(toggle_modal)
+
+app.callback(
+    Output('modal-open-table', 'is_open'),
+    [
+        Input('open-open-table', 'n_clicks'),
+        Input('close-open-xl',   'n_clicks')   # closing the modal window
+    ],
+    [State('modal-open-table', 'is_open')],
+)(toggle_modal)
+
 @ app.callback(
     Output("page-content", "children"),
     [

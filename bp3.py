@@ -116,12 +116,12 @@ def update_lc_block():
         start_date = wd.workday(p_due_date, days=int(-total_work), holidays=holidays, weekends=weekends)
         p_finish   = wd.workday(start_date, days=int(total_work),  holidays=holidays, weekends=weekends)
         sd_series  = completed_df.apply(lambda x: date_calc(sd=start_date, days=int(total_work - x.r_sum)), axis=1)
-        index = completed_df.index
+        completed_index = completed_df.index
         if rule != 'BP':
             x = 1
             # df_bp.loc[index, percent_complete] = 0.0
         else:
-            df_bp.loc[index, 'Start'] = sd_series.dt.strftime('%d/%m/%Y')
+            df_bp.loc[completed_index, 'Start'] = sd_series.dt.strftime('%d/%m/%Y')
         try:
             df_bp.loc[p_index, 'planned finish'] = p_finish.strftime('%d/%m/%Y')
         except ValueError:
@@ -200,7 +200,6 @@ def update_mom_block():
     return df_bp
 
 def logmar_handler():
-    """ df_dv is the dv sheet compiled in skeleton file """
     df_x = df_bp[df_bp['RN'].str.endswith('.02.03') & ( df_bp['source'] == 'logmar' )]
     df_x = df_x.copy()
     i_list = df_x.index
@@ -214,19 +213,18 @@ def logmar_handler():
         e_date     = parent_row.RN.map(skeleton_map.get('Finish')).values[0]
         p_complete = parent_row.RN.map(skeleton_map.get('% Complete')).values[0]
         logmar_row = df_bp[( df_bp['parent'] == parent_rn ) & ( df_bp['RN'].str.endswith('.02.03') )]
-        duration   = len(pd.date_range(s_date, e_date, freq='C'))
+        duration   =  len(pd.date_range(s_date, e_date, freq='C'))
         l_index    = logmar_row.index
         df_bp.loc[l_index, 'Start']    = pd.to_datetime(s_date)
         df_bp.loc[l_index, 'Finish']   = pd.to_datetime(e_date)
         df_bp.loc[l_index, 'Duration'] = duration
         df_bp.loc[l_index, pc]         = p_complete
-        if p_complete == 0:
+        if p_complete < 1:
             df_bp.loc[l_index, CD] = pd.to_datetime(e_date).strftime('%d/%m/%Y')
             df_bp.loc[l_index, CT] = config['constraint_type'].get('MFO')
         else:
-            # df_bp.loc[l_index, CT] = config['constraint_type'].get('MSO')
-            df_bp.loc[l_index, 'Finish'] = None
-            df_bp.loc[l_index, 'Start'] = pd.to_datetime(s_date).strftime('%d/%m/%Y')
+            df_bp.loc[l_index, CD] = pd.to_datetime(s_date).strftime('%d/%m/%Y')
+            df_bp.loc[l_index, CT] = config['constraint_type'].get('MSO')
 
     x = df_bp
     return df_bp
@@ -253,12 +251,14 @@ def predecessor_handler():
             p_line     = str(df_m.index.max())
             df_bp.loc[rule_index, 'Predecessors'] = [p_line if len(df_m) > 0 else '']
 
-    logmar_mask = df_bp[( df_bp['source'] == 'logmar' ) & ( df_bp['RN'].str.endswith('.02.03') )]
-    logmar_mask = logmar_mask[logmar_mask[pc] > 0]
+    logmar_mask = df_bp[( df_bp['source'] == 'logmar' )]
     df_bp.loc[logmar_mask.index, 'Predecessors'] = ''
-#     df_bp.loc[logmar_mask.index, 'Duration'] = logmar_mask['Duration']
-#     df_bp.loc[logmar_mask.index, 'Work'] = logmar_mask['Duration']
-
+    df_bp.loc[logmar_mask.index, 'Duration'] = logmar_mask['Duration']
+    df_bp.loc[logmar_mask.index, 'Start']  = pd.to_datetime(df_bp.loc[logmar_mask.index, 'Start']).dt.strftime('%d/%m/%Y')
+    df_bp.loc[logmar_mask.index, 'Finish'] = pd.to_datetime(df_bp.loc[logmar_mask.index, 'Finish']).dt.strftime('%d/%m/%Y')
+    mask_1 = logmar_mask[logmar_mask[pc] == 0]
+    df_bp.loc[mask_1.index, CD] = df_bp.loc[mask_1.index, 'Start']
+    df_bp.loc[mask_1.index, CT] = config['constraint_type'].get('MSO')
     return df_bp
 
 def assign_to_major_ms():
@@ -282,7 +282,7 @@ def assign_to_major_ms():
                 ( df_bp['rule'] == rule ) &
                 ( df_bp['Name'].isin([ms_name] )) &
                 ( df_bp['domain'] == domain )
-            ]['row_number'].sort_values()
+                ]['row_number'].sort_values()
             task_list = [str(int(t)) for t in task_list]
             p_list.append(task_list)
             if len(p_list) > 0:
@@ -324,7 +324,7 @@ def assign_to_major_ms():
     df_bp.loc[24, 'Predecessors'] = rn_list
 
 def assign_pred_to_dev_lc():
-    # df_bi = pd.read_excel(bi, sheet_name='Task_Table1')
+    """ Assign the signature of Sagiv to the beginning of the development life cycle """
     df_bi = df_bp.copy()
     s = 'אישור שגיב שרביט'
 
@@ -369,6 +369,7 @@ def mark_milestone_complete():
     df_bp['p_list'] = df_bp['Predecessors'].str.split(',')
     df_milestones = df_bp[df_bp['isMS'] == 1]
     for index, row in df_milestones.iterrows():
+        name = row.Name
         if row.p_list:
             parent = row.parent
             p_list     = row.p_list
@@ -382,6 +383,8 @@ def mark_milestone_complete():
                 p_finish = df_bp.loc[r, 'Finish']
                 if p_finish:
                     dates.append(p_finish)
+                else:
+                    dates.append(df_bp.loc[r, 'Start'])
                 p_sum += p
             if p_sum == p_list_len and dates:
                 dt_max = max(dates)
@@ -390,6 +393,22 @@ def mark_milestone_complete():
                 df_bp.loc[r_n, 'Start']  = dt_max
                 # df_bp.loc[r_n, CT]       = config['constraint_type'].get('MFO')
                 # df_bp.loc[r_n, CD]       = dt_max
+
+    """ 9/8/2021 addition: fixing BP start of the last rows of BP cycle """
+    s = 'אישור שגיב שרביט'
+    bp_signature = df_bp[( df_bp['Name'].isin([s]) ) & df_bp[pc] == 1]
+    bp_signature = bp_signature[['process_id', 'Finish']]
+    bp_signature.set_index('process_id', inplace=True)
+
+    df_bp_1 = df_bp[df_bp['Name'] == 'בחתימה']
+    df_bp_1 = df_bp_1.copy()
+    df_bp_1['Start'] = df_bp_1.process_id.map(bp_signature.get('Finish'))
+    df_bp.loc[df_bp_1.index, 'Start'] = df_bp_1['Start']
+
+    df_bp_2 = df_bp[df_bp['Name'] == 'חתום']
+    df_bp_2 = df_bp_2.copy()
+    df_bp_2['Start'] = df_bp_2.process_id.map(bp_signature.get('Finish'))
+    df_bp.loc[df_bp_2.index, 'Start'] = df_bp_2['Start']
 
 def epilog():
     df_ems = df_bp[
@@ -415,8 +434,8 @@ def epilog():
     df_bp['Duration'] = df_bp['Duration'].fillna(0)
 
     df_bp['isMS']     = df_bp['isMS'].apply(lambda x: x if x == 1 else 0)
-    df_bp['Work']     = df_bp.apply(lambda x: 0 if x.isMS == 1 else x.Work,     axis=1)
-    df_bp['Duration'] = df_bp.apply(lambda x: 0 if x.isMS == 1 else x.Duration, axis=1)
+    df_bp['Work']     = df_bp.apply(lambda x: 0 if x.isMS == 1 and x.source != 'logmar' else x.Work,     axis=1)
+    df_bp['Duration'] = df_bp.apply(lambda x: 0 if x.isMS == 1 and x.source != 'logmar' else x.Duration, axis=1)
     df_bp['Deadline'] = None
     df_bp[pc] = df_bp[pc].fillna(0)
     df_bp[pc] = df_bp[pc].astype(float)
@@ -505,7 +524,7 @@ if __name__ == '__main__':
 
     # 5. Update Life Cycle and MoM blocks
     start      = time.time()
-    df_bp['Finish'] = None
+    # df_bp['Finish'] = None
     df_bp = update_lc_block()
     df_bp = update_mom_block()
     print('{:50}: {:05.2f}'.format('03. Update Life Cycle and MoM blocks', time.time() - start))
@@ -517,7 +536,7 @@ if __name__ == '__main__':
     # 5a. Predecessor Handler
     start = time.time()
     df_bp = df_bp.copy()
-    df_bp = logmar_handler()
+    # df_bp = logmar_handler()
     print('{:50}: {:05.2f}'.format('04. Logmar Handler', time.time() - start))
 
     # 6. Predecessor Handler
@@ -566,5 +585,4 @@ if __name__ == '__main__':
     writer.save()
     print('{:50}: {:05.2f}'.format('writing p3-out.xlsx file', time.time() - start))
     print('{:50}: {:05.2f}'.format('execution elapse time', time.time() - start_s))
-
 

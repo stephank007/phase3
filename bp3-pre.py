@@ -114,6 +114,7 @@ def insert_realization_requirements():
     df_shortlist['s_rule']         = df_shortlist['s_rule'].str.strip()
     df_shortlist['Name']           = df_shortlist['Name'].str.strip()
     df_shortlist['xRN']            = df_shortlist['xRN'].str.strip()
+    df_shortlist['source']         = 'logmar'
 
     p_logmar_map = df_domain_reference[['p_logmar', 'process_id']]
     p_logmar_map.set_index('p_logmar', inplace=True)
@@ -166,7 +167,6 @@ def insert_realization_requirements():
             df_shortlist.loc[i_list, 'rule'] = rule
 
     df_shortlist['parent'] = df_shortlist['RN']
-    df_shortlist['source'] = 'logmar'
     return df_shortlist
 
 def insert_project_header():
@@ -276,6 +276,17 @@ def insert_rule_block(df=pd.DataFrame()):
         name = row.get('Name').values[0]
         xrn  = row.xRN.values[0]
         source = row.source.values[0] if row.source.values[0] == 'logmar' else None
+        """ catch all you can from the shortlist and save time for later """
+        s_date = None
+        e_date = None
+        duration = 0
+        per_c = 0
+        if source == 'logmar':
+            s_date = row.Start.values[0]
+            e_date = row.Finish.values[0]
+            duration = row.Duration.values[0]
+            per_c    = row[pc].values[0]
+        df_bp.loc[row.index, 'source'] = None if source == 'logmar' else source
         try:
             rule = row['rule'].values[0]
         except Exception as e:
@@ -288,7 +299,11 @@ def insert_rule_block(df=pd.DataFrame()):
         df_r['RN']         = p + df_r['RN']
         df_r['xRN']        = xrn
         df_r['parent']     = p
-        df_r['source']     = source
+        df_r['source']     = df_r['RN'].apply(lambda x: source   if x.endswith('.02.03') else None)
+        df_r['Start']      = df_r['RN'].apply(lambda x: s_date   if x.endswith('.02.03') else None)
+        df_r['Finish']     = df_r['RN'].apply(lambda x: e_date   if x.endswith('.02.03') else None)
+        df_r['Duration']   = df_r['RN'].apply(lambda x: duration if x.endswith('.02.03') else None)
+        df_r[pc]           = df_r['RN'].apply(lambda x: per_c    if x.endswith('.02.03') else None)
         df_r['row_type']   = 'rule'
         df_r['rule']       = rule
         df_r['domain_id']  = df[(df['RN'].isin([p]))]['domain_id'].values[0]
