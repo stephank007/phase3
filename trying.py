@@ -97,25 +97,26 @@ def build_hierarchical_dataframe(df, levels, value_column, color_columns=None):
     df_all_trees = df_all_trees.append(total, ignore_index=True)
     return df_all_trees
 
-# df['completed']  = df[pc].apply(lambda x: 1 if x == 1.0 else 0.0001)
-df = df.groupby(by=['rule', 'domain_id', 'process_id']).sum()[['value', 'Duration']].reset_index()
-#df = df[['rule', 'domain_id', 'process_id', 'value', 'Duration']].reset_index()
-#df.sort_values(['rule', 'domain_id', 'process_id'], inplace=True)
+df['key'] = df['domain_id'] + '--' + df['process_id']
+df = df.groupby(by=['rule', 'key']).sum()[['old_budget', 'value']].reset_index().rename(columns={'value': 'value_x'})
 
-levels = ['process_id', 'domain_id', 'rule']  # levels used for the hierarchical chart
-color_columns = ['value', 'Duration']
-value_column = 'value'
-#
-# df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/sales_success.csv')
-# print(df.head())
-#
-# levels = ['salesperson', 'county', 'region'] # levels used for the hierarchical chart
-# color_columns = ['sales', 'calls']
-# value_column = 'calls'
-
+levels = ['key' , 'rule']  # levels used for the hierarchical chart
+color_columns = ['old_budget', 'value_x']
+value_column = 'old_budget'
+average_score = df['value_x'].sum() / df['old_budget'].sum()
 df_all_trees = build_hierarchical_dataframe(df, levels, value_column, color_columns)
+df_all_trees.fillna(0, inplace=True)
+
+#
+df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/sales_success.csv')
+print(df.head())
+#
+levels = ['salesperson', 'county', 'region'] # levels used for the hierarchical chart
+color_columns = ['sales', 'calls']
+value_column = 'calls'
+
 # average_score = df['sales'].sum() / df['calls'].sum()
-average_score = df['value'].sum() / df['Duration'].sum()
+# df_all_trees = build_hierarchical_dataframe(df, levels, value_column, color_columns)
 ##############################################################
 fig = go.Figure()
 fig.add_trace(go.Sunburst(
@@ -127,11 +128,11 @@ fig.add_trace(go.Sunburst(
         colors=df_all_trees['color'],
         colorscale='RdBu',
         cmid=average_score),
-    hovertemplate='<b>%{label} </b> <br> value: %{value}<br> Duration: %{color:.2f}',
+    hovertemplate='<b>%{label} </b> <br> value: %{value_x}<br> value: %{color:.2f}',
     name=''
     )
 )
-
+#
 fig.update_traces(insidetextorientation='radial')
 fig.update_layout(
     title="process weight distribution",
