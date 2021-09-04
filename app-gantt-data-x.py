@@ -52,7 +52,13 @@ custombday = pd.offsets.CustomBusinessDay(weekmask=weekmask, holidays=holidays)
 weekends = (FRI, SAT)
 
 today    = pd.to_datetime('today')
-today_mm = today.strftime('%Y-%m')
+if today.day < 16:
+    today_mm = (today - pd.DateOffset(months=1)).strftime('%Y-%m')
+else:
+    today_mm = today.strftime('%Y-%m')
+
+print(today_mm)
+quit()
 deadline = pd.to_datetime('2020/10/31', format='%Y/%m/%d')
 x_start  = pd.to_datetime('2020/08/01', format='%Y/%m/%d')
 
@@ -93,6 +99,7 @@ pr_map = df_pr.to_dict()
 
 df_sl = df_bi[df_bi['source'] == 'logmar']
 df_sl = df_sl.copy()
+df_sl['process']    = df_sl['process'].apply(lambda x: f'{x:0>5}')
 
 df_task['Name'] = df_task['Name'].str.strip()
 df_task.set_index('Name', inplace=True)
@@ -131,10 +138,19 @@ bl_gantt_int_map = bl_gantt_int_map.to_dict()
 df_bi['Name']    = df_bi['Name'].str.strip()
 df_bi['m_task']  = df_bi.Name.map(task_map.get('Step'))  # map major lifecycle to all tasks
 df_bi['publish'] = df_bi.process.map(pr_map.get('BP'))
-process_list = df_bi[df_bi['publish'] == 'publish']['process'].unique()
 
-cycle_map = df_bi[( df_bi['m_task'].notnull() ) & ( df_bi['publish'] == 'publish' )]
+process_list = sorted(list(df_bi[df_bi['publish'] == 'publish']['process'].unique()))
+sl_plist     = sorted(list(df_sl['process'].unique()))
+xlist = set(sl_plist).intersection(process_list)
+process_list = sorted(list(set(sl_plist + process_list)))
+print(len(process_list))
+for p in xlist:
+    print(p)
 
+quit(0)
+
+###### cycle_map = df_bi[( df_bi['m_task'].notnull() ) & ( df_bi['publish'] == 'publish' )]
+cycle_map = df_bi[( df_bi['m_task'].notnull() ) & ( df_bi['process'].isin(process_list) )]
 cycle_map = cycle_map.groupby(['domain_id', 'process_id', 'm_task']).agg(  # find min/max dates for each Step
     {
         'Start_Date' : 'min',
@@ -158,7 +174,6 @@ df_rn_totals = pd.pivot_table(
 )
 df_rn_totals.reset_index(inplace=True)
 """ END shortlist PIVOT"""
-df_sl['process']    = df_sl['process'].apply(lambda x: f'{x:0>5}')
 df_sl['weight']     = df_sl.process.map(pr_map.get('weight'))
 df_sl['month']      = pd.to_datetime(df_sl['Finish_Date']).dt.strftime('%Y-%m')
 df_sl['new_budget'] = df_sl['weight'] * df_sl['Duration']
@@ -202,7 +217,7 @@ bp_finish_map = cycle_map[cycle_map['m_task'] == 'BP']
 bp_finish_map.set_index('process_id', inplace=True)
 
 bp_list = [x + '.BP' for x in process_list]
-df_bp = df_bi[df_bi['RN'].isin(bp_list)]
+df_bp = df_bi[df_bi['RN'].isin(process_list)]
 df_bp = df_bp.copy()
 df_bp = df_bp[['RN', 'domain_id', 'process_id', 'Start_Date', 'Finish_Date', 'Duration', 'pc', 'publish']]
 df_bp['Finish_Date'] = df_bp.process_id.map(bp_finish_map.get('Finish_Date'))
@@ -216,7 +231,7 @@ df_bp['c_date'] = df_bp.apply(
         weekends=weekends
     ) if x.pc < 1 else x.Finish_Date, axis=1
 )
-''' END BP '''
+''' END BP map '''
 df_logmar   = df_sl.groupby(['domain_id', 'process_id']).agg({
     'c_days'     : 'sum',
     'Duration'   : 'sum',
@@ -258,16 +273,16 @@ df_t1.reset_index(inplace=True)
 for index, row in df_t1.iterrows():
     df_x = df_t1[df_t1.process_id == row.process_id]
     try:
+        xz = df_bp[df_bp.process_id == row.process_id]
         logmar_c_date = df_bp[df_bp.process_id == row.process_id]['Start_Date'].values[0]
     except IndexError as ex:
-        logmar_c_date = df_bp.loc[row['process_id'], 'Start_Date']
-        continue
+        print(row.process_id)
+        quit(0)
     df_x = df_x.copy()
     df_x['s_date'] = df_x['Finish_Date'].shift(1)
     df_t1.loc[df_x.index.min():df_x.index.max(), 'Start_Date'] = df_x['s_date']
     df_x.loc[df_x.index.min(), 's_date'] = logmar_c_date
     df_t1.loc[df_x.index.min():df_x.index.max(), 'Start_Date'] = df_x['s_date']
-df_t1['bl-finish'] = df_t1.process_id.map(bl_gantt_data_map.get('Finish_Date'))          # finish from gantt-data sheet
 """ fix TEST start date as per the max finish date between Dev and Int"""
 t1_int = df_t1[df_t1['m_task'] == 'INT']
 t1_dev = df_t1[df_t1['m_task'] == 'SAP']
@@ -287,7 +302,7 @@ for index, row in t1_int.iterrows():
 for index, row in t1_dev.iterrows():
     bp_index = df_bp[df_bp['process_id'] == row.process_id].index
     df_bp.loc[bp_index, 'dev_fd'] = row.Finish_Date
-df_bp['dev_fd'] = df_bp.apply(lambda x: x.Finish_Date if x.logmar_pc == 0 else x.dev_fd, axis=1)
+# df_bp['dev_fd'] = df_bp.apply(lambda x: x.Finish_Date if x.logmar_pc == 0 else x.dev_fd, axis=1)
 
 df_t1['m_task'] = pd.Categorical(df_t1['m_task'], categories=lc_list, ordered=False)     # keep category order as appears on the list
 df_t1.sort_values(['domain_id', 'process_id', 'm_task'], inplace=True, ascending=False)

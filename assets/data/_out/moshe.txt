@@ -1,0 +1,66 @@
+=====================
+key: value
+Sort: 10140
+Sygn: 822
+Details: Department I (Investigation Department) [Oddział I (śledczy)]
+Person and details [date format:  daymonthyear]
+Surname from previous column: RAJSMAN
+=====================
+key: value
+Sort: 17028
+Sygn: 822
+Details: Department I (Investigation Department) [Oddział I (śledczy)]
+Person and details [date format:  daymonthyear]
+Surname from previous column: RAJSMAN
+File number: Rada2/0949tif
+Number in list (if any): 4686
+Given name: Eliasz
+Surname: RAJZMAN
+Other information about this person: Aleja 8
+General description of this list (if any): nan
+General description of information on this page: Material in Polish (text, chart, graph, etc)
+Typist comments: nan
+=====================
+key: value
+Sort: 18104
+Sygn: 822
+Details: Resides on Aleja 8
+Person and details [date format:  daymonthyear]
+Surname from previous column: RAJSMAN
+File number: Rada2/0949tif
+Number in list (if any): 4686
+Given name: Eliasz
+Surname: RAJZMAN
+Other information about this person: Aleja 8
+General description of this list (if any): nan
+General description of information on this page: Material in Polish (text, chart, graph, etc)
+Typist comments: nan
+Digital file name: 0949tifpdf
+Surname(s) in column to the left (if not in the surname column): SCHUBER
+=====================
+key: value
+Sort: 11484
+Sygn: 822
+Details: Summary of each entry; see pdf file for each image number for a compete translation of the page
+Person and details [date format:  daymonthyear]
+Surname from previous column: RAJSMAN
+File number: Rada2/0949tif
+Number in list (if any): 4686
+Given name: Eliasz
+Surname: RAJZMAN
+Other information about this person: Aleja 8
+General description of this list (if any): nan
+General description of information on this page: Material in Polish (text, chart, graph, etc)
+Typist comments: nan
+Digital file name: 0949tifpdf
+Surname(s) in column to the left (if not in the surname column): SCHUBER
+Microfilm roll: Microfilm roll 2
+Page: 0609 and 0610
+Image: wwwcrargorg/i…6103vmJXPpdf
+Surname(s) for this entry: ZOMERSZTAJN, LIPSZYC, RAJZMAN
+A person in this entry: Eliasz Zomersztajn
+Surname from the previous column: ZOMERSZTAJN
+Birth date: nan
+Address: Dreszera 9
+Other family listed: nan
+Summary of material: Zomersztajn’s apartment is to be sealed

@@ -480,9 +480,13 @@ def display_bullet_chart():
             }
         ),
     )
+    target_text = 'target: {:.1f}%'.format(target)
+    actual_text = 'actual: {:.1f}%'.format(actual)
+    fig = annotation_style_position(figure=fig, text=target_text, x_position=target/100)
+    fig = annotation_style_position(figure=fig, text=actual_text, x_position=actual/100)
 
     # fig = annotation_style_position(figure=fig, text='נקודת המטרה', x_position=target/100 - 0.10)
-    t_text = ' {:.1f}% <= {:.1f}%  מול יעד של {:.1f}% :ההתקדמות בפועל'.format(( actual/target ) * 100, actual, target)
+    t_text = '% Completion: Target vs. Actual'
     fig.update_layout(
         height=250,
         title={
@@ -713,7 +717,7 @@ def marimekko_chart(df_dev=pd.DataFrame):
             x0=x0_vrect,
             x1=x1_vrect,
             # fillcolor='#997c2e',
-            fillcolor='darkgreen',
+            fillcolor='darksalmon',
             opacity=0.5,
             layer='above',
             line_width=0
@@ -1017,6 +1021,7 @@ def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
     )
     fig.data[1]['marker']['opacity'] = 1.0
     fig.data[2]['marker']['opacity'] = 0.62
+    fig.data[2]['marker']['width']   = 0.5
     return fig
 
 def gantt_contract():

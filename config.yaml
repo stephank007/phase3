@@ -38,6 +38,7 @@ config:
   in-out       : _out/dev-io.xlsx
   risk-out     : _out/risk_out.xlsx
   risk-s-out   : _out/risk_stacked_out.xlsx
+  json_data    : _out/moshe.txt
   sig_file     : ‏‏סבב חתימות 7.10.20.xlsx
   gantt_bl     : L:\projects\history\data\baseline\g_data_x.xlsx
   ms_path      : C:\Program Files\Microsoft Office\root\Office16
