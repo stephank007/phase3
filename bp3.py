@@ -219,6 +219,7 @@ def logmar_handler():
         df_bp.loc[l_index, 'Finish']   = pd.to_datetime(e_date)
         df_bp.loc[l_index, 'Duration'] = duration
         df_bp.loc[l_index, pc]         = p_complete
+        df_bp.loc[l_index, 'Work']     = duration
         if p_complete < 1:
             df_bp.loc[l_index, CD] = pd.to_datetime(e_date).strftime('%d/%m/%Y')
             df_bp.loc[l_index, CT] = config['constraint_type'].get('MFO')
@@ -256,9 +257,28 @@ def predecessor_handler():
     df_bp.loc[logmar_mask.index, 'Duration'] = logmar_mask['Duration']
     df_bp.loc[logmar_mask.index, 'Start']  = pd.to_datetime(df_bp.loc[logmar_mask.index, 'Start']).dt.strftime('%d/%m/%Y')
     df_bp.loc[logmar_mask.index, 'Finish'] = pd.to_datetime(df_bp.loc[logmar_mask.index, 'Finish']).dt.strftime('%d/%m/%Y')
-    mask_1 = logmar_mask[logmar_mask[pc] == 0]
+    df_bp.loc[logmar_mask.index, 'Work']   = 0
+
+    mask_1 = logmar_mask[logmar_mask[pc] == 0]   # for all logmar with % Complete == 0
     df_bp.loc[mask_1.index, CD] = df_bp.loc[mask_1.index, 'Start']
     df_bp.loc[mask_1.index, CT] = config['constraint_type'].get('MSO')
+
+    """ Assign Start / Finish """
+    mask_major = df_bp[df_bp['RN'].isin(config['project_major_steps'])]
+    mask_major = mask_major.copy()
+    mask_major['s_date']   = mask_major.RN.map(major_map.get('start'))
+    mask_major['f_date']   = mask_major.RN.map(major_map.get('finish'))
+    mask_major['Duration'] = mask_major.apply(lambda x: len(pd.date_range(x.s_date, x.f_date, freq=custombday)), axis=1)
+
+    df_bp.loc[mask_major.index,    'Start'] = mask_major['s_date']
+    df_bp.loc[mask_major.index,   'Finish'] = mask_major['f_date']
+    df_bp.loc[mask_major.index, 'Duration'] = mask_major.Duration
+
+    i_00_index = mask_major[mask_major['RN'] == 'A-00']['row_number'].values[0]
+    df_bp.loc[i_00_index, 'Predecessors'] = 7
+    df_bp.loc[i_00_index + 1, 'Predecessors'] = i_00_index
+    df_bp.loc[i_00_index + 2, 'Predecessors'] = i_00_index + 1
+
     return df_bp
 
 def assign_to_major_ms():
@@ -445,6 +465,12 @@ def epilog():
     df_bp['task_notes'] = df_bp['task_notes'].apply(lambda x: re.subn(r'[\r\n]', '--', str(x))[0])
     df_bp['task_notes_2'] = df_bp['task_notes_2'].apply(lambda x: re.subn(r'[\r\n]', '--', str(x))[0])
 
+    logmar_parents = df_bp[( df_bp['rule'].isin(['SAP', 'INT', 'CNV']) ) & ( df_bp['row_type'] == 'parent' )]
+    df_bp.loc[logmar_parents.index, 'Duration'] = 0
+    df_bp.loc[logmar_parents.index, pc] = 0
+    df_bp.loc[logmar_parents.index, 'Start']  = ''
+    df_bp.loc[logmar_parents.index, 'Finish'] = ''
+
     return df_bp
 
 ''' Execution Order '''
@@ -483,15 +509,19 @@ if __name__ == '__main__':
     fs = os.path.join(path, config['config'].get('skeleton'))
     fz = os.path.join(path, config['config'].get('consolidated'))
     bi = os.path.join(path, config['config'].get('p3BI'))
-    f5 = config['config'].get('pdr-meeting')
 
     writer = pd.ExcelWriter(fo, engine='xlsxwriter')
     workbook = writer.book
 
     # df_dv      = pd.read_excel(fs, sheet_name='dev')  # logmar data inside the skeleton file
+    major_map = pd.read_excel(fr, sheet_name='major')
+    major_map = major_map[['RN', 'task', 'start', 'finish']]
+    major_map = major_map[~major_map['RN'].isnull()]
+    major_map.set_index('RN', inplace=True)
+    major_map = major_map.to_dict()
+
     df_bp      = pd.read_excel(fs, sheet_name='skeleton')
     df_rules_x = pd.read_excel(fr, sheet_name='Lines')
-    df_m4n     = pd.read_excel(f5, sheet_name='dl')
     df_bp['process'] = df_bp['process_id'].apply(lambda x: x.split(':')[0] if isinstance(x, str) else None)
     df_bp['domain']  = df_bp['domain_id'].apply(lambda x: x.split(':')[0] if isinstance(x, str) else None)
 
@@ -585,4 +615,3 @@ if __name__ == '__main__':
     writer.save()
     print('{:50}: {:05.2f}'.format('writing p3-out.xlsx file', time.time() - start))
     print('{:50}: {:05.2f}'.format('execution elapse time', time.time() - start_s))
-

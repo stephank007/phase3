@@ -46,7 +46,6 @@ app.layout = html.Div(
 def update_dropdown(name):
     return ap.update_dropdown(name)
 
-""" process dropdown """
 @app.callback(
     [
         Output('selected-row-text'   , 'children'),
@@ -72,7 +71,7 @@ def update_dropdown(selected_process, selected_rule, stored_domain, n_clicks):
         Input('process-dropdown'    , 'value'),
         Input('df-requirements-data', 'data'),
         Input('marimekko-figure'    , 'clickData'),
-        Input('clear', 'n_clicks')
+        Input('clear'               , 'n_clicks'),
     ]
 )
 def requirements_status(selection, df_requirements, click, n_clicks):
@@ -88,6 +87,22 @@ def requirements_status(selection, df_requirements, click, n_clicks):
     requirements_table = ap.display_requirements_table(dff=df_requirements, selected_month=t1)
     return requirements_table
 
+""" Risk Table Handler """
+@app.callback(
+    Output('risk-table', 'children'),
+    [
+        Input('risk-stacked', 'clickData')
+    ]
+)
+def risktable_rendition(click_data):
+    month = None
+    text  = None
+    if click_data is not None:
+        month = click_data['points'][0].get('label')
+        text = click_data['points'][0].get('text')
+    return ap.display_risktable(month=month, text=text)
+""" END Risk Table Handler """
+
 @app.callback(
     Output('gantt-chart', 'figure'),
     [Input('rule-radio-items', 'value')],
@@ -100,6 +115,7 @@ def toggle_modal(n1, n2, is_open):
         return not is_open
     return is_open
 
+""" general callbacks """
 app.callback(
     Output('modal-closed-table', 'is_open'),
     [
@@ -128,7 +144,7 @@ def render_page_content(pathname):
     if pathname == "/":
         return ap.home_page()
     elif pathname == "/page-1":
-        return html.Div(ap.page_1(), lang='he', dir='ltr')
+        return ap.page_1()
     elif pathname == "/page-2":
         return ap.page_2()
     # If the user tries to reach a different page, return a 404 message

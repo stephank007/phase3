@@ -82,7 +82,6 @@ def prepare_interface():
     return df_interfaces
 
 def insert_hd1_rows(df=pd.DataFrame()):
-    df['Deadline'] = pd.to_datetime(df['Deadline'], errors='ignore')
     df['ts_#'] = df['t_shirt'].map(config.get('t_shirt_#'))
 
     df_hd = df[df['row_type'] == 'parent']
@@ -115,6 +114,7 @@ def insert_realization_requirements():
     df_shortlist['Name']           = df_shortlist['Name'].str.strip()
     df_shortlist['xRN']            = df_shortlist['xRN'].str.strip()
     df_shortlist['source']         = 'logmar'
+    df_shortlist['Name']           = df_shortlist.xRN.map(requirements_map.get('hebrew_nm'))
 
     p_logmar_map = df_domain_reference[['p_logmar', 'process_id']]
     p_logmar_map.set_index('p_logmar', inplace=True)
@@ -170,12 +170,9 @@ def insert_realization_requirements():
     return df_shortlist
 
 def insert_project_header():
-    df_dl     = pd.read_excel(f5, sheet_name='dl')
-    m4n_mm    = pd.read_excel(f5, sheet_name='m4n-mm')
     df_mrs    = pd.read_excel(f6, sheet_name='Task_Table1')
     df_header = pd.read_excel(fr, sheet_name='header')
     df_header['row_type'] = 'header'
-    df_dl = df_dl.fillna('')
 
     mrs_uids = df_header['source'].to_list()
     mrs_uids = [int(x) for x in mrs_uids if np.isnan(x) == False]
@@ -188,41 +185,6 @@ def insert_project_header():
     mrs_map = df_mrs.to_dict()
     df_header['due_date'] = df_header.source.map(mrs_map.get('Start'))
     df_header[pc] = df_header.source.map(mrs_map.get('Percent_Complete'))
-
-    i = 0
-    for index, row in df_dl.iterrows():
-        i = i + 1
-        rn = '00.50.' + f'{i:0>2}'
-        df_dl.loc[index, 'RN']        = rn
-        df_dl.loc[index, 'Name']      = df_dl.loc[index, 'p_name'] + ' -- ' + df_dl.loc[index, 'task']
-        df_dl.loc[index, 'Deadline']  = df_dl.loc[index, 'dl_date'].strftime('%d/%m/%Y')
-        df_dl.loc[index, 'source']    = df_dl.loc[index, 'WBS']
-        df_dl.loc[index, 'alias']     = df_dl.loc[index, 'WBS']
-        df_dl.loc[index, OL]          = 3
-        df_dl.loc[index, 'due_date']  = df_dl.loc[index, 'dl_date']
-        df_dl.loc[index, 'isMS']      = 1
-        df_dl.loc[index, 'row_type']  = 'm4n-dl'
-
-    """ mark M4N Major Milestones and manage them separately """
-    i = 0
-    for index, row in m4n_mm.iterrows():
-        i += 1
-        rn = '00.40.' + f'{i:0>2}'
-
-        m4n_mm.loc[index, 'RN']       = rn
-        m4n_mm.loc[index, OL]         = 3
-        m4n_mm.loc[index, 'alias']    = row.task
-        m4n_mm.loc[index, 'Name']     = row.task
-        m4n_mm.loc[index, 'row_type'] = 'm4n-ms'
-        m4n_mm.loc[index, 'due_date'] = row.finish
-        m4n_mm.loc[index, 'Deadline'] = row.finish
-        m4n_mm.loc[index, 'isMS']     = 1
-        m4n_mm.loc[index, 'source']   = row.WBS
-
-    m4n_mm['Task Mode'] = 'Manually Scheduled'
-    m4n_mm = m4n_mm[['Outline Level', 'RN', 'Name', 'row_type', 'Deadline', 'due_date', 'isMS', 'source', 'alias']]
-    df_dl  = df_dl[['Outline Level', 'RN', 'Name', 'row_type', 'Deadline', 'due_date', 'isMS', 'source', 'alias']]
-    df_header = pd.concat([df_header, df_dl, m4n_mm], ignore_index=True)
 
     return df_header
 
@@ -291,7 +253,7 @@ def insert_rule_block(df=pd.DataFrame()):
             rule = row['rule'].values[0]
         except Exception as e:
             print('Oops! insert rule block', e.__class__, 'occurred')
-        df.loc[row.index, 'Name'] = str(name) + ' - ' + str(rule)
+        df.loc[row.index, 'Name'] = str(name)  #  + ' - ' + str(rule)
 
         df_r = df_rl[df_rl['Rule'].isin([rule])]
         df_r = df_r.copy()
@@ -376,13 +338,17 @@ if __name__ == '__main__':
     fs = os.path.join(path, config['config'].get('skeleton'))
     f3 = os.path.join(path, config['config'].get('tasks'))
     f4 = os.path.join(path, config['config'].get('shortlist'))
-    f5 = config['config'].get('pdr-meeting')
     f6 = os.path.join(path, config['config'].get('mrs'))
+    f7 = os.path.join(path, config['config'].get('requirements'))
 
     df_process_ref      = pd.read_excel(fn, sheet_name='process_ref')
     df_domain_reference = pd.read_excel(fn, sheet_name='domain_ref')
     df_rl               = pd.read_excel(fr, sheet_name='Lines')
     df_shortlist        = pd.read_excel(f4, sheet_name='Sheet1')
+    requirements_map    = pd.read_excel(f7, sheet_name='דרישות')
+
+    requirements_map.rename(columns=config['realization_columns_map'], inplace=True)
+    requirements_map.set_index('xRN', inplace=True)
 
     df_rl['t_shirt_tuple'] = df_rl[df_rl.columns[7:12]].apply(tuple, axis=1)
 

@@ -6,12 +6,11 @@ import warnings as warning
 import yaml
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.figure_factory as ff
 import dash_core_components as dcc
 import dash_html_components as html
 import dash_bootstrap_components as dbc
 import dash_table as dt
-import r_heatmap
-import r_stacked
 
 pd.options.mode.chained_assignment = 'raise'
 warning.filterwarnings('ignore')
@@ -50,10 +49,16 @@ f1 = os.path.join(path, config['config'].get('pmo'))
 f2 = os.path.join(path, config['config'].get('name'))
 f3 = os.path.join(path, config['config'].get('p3BI'))
 f4 = os.path.join(path, '_in/motd.xlsx')
-
+f5 = os.path.join(path, config['config'].get('risk-out'))
 
 today    = pd.to_datetime('today')
-today_mm = today.strftime('%Y-%m')
+if today.day < 16:
+    today_mm = ( today - pd.DateOffset(months=1) ).strftime('%Y-%m')
+else:
+    today_mm = today.strftime('%Y-%m')
+
+print('today_mm: ', today_mm)
+
 deadline = pd.to_datetime('2020/10/31', format='%Y/%m/%d')
 x_start  = pd.to_datetime('2020/08/01', format='%Y/%m/%d')
 
@@ -67,11 +72,16 @@ df_rd = pd.read_excel(fn, sheet_name='raw-dev')
 df_bm = pd.read_excel(fn, sheet_name='bl-month')
 df_gt = pd.read_excel(fn, sheet_name='g-totals')
 df_evm= pd.read_excel(fn, sheet_name='EVM')
+df_pd = pd.read_excel(fn, sheet_name='process_dates')
 df_pr = pd.read_excel(f2, sheet_name='process_ref')
 df_bi = pd.read_excel(f3, sheet_name='Task_Table1')
 motd  = pd.read_excel(f4, sheet_name='Sheet2')
+df_rsk= pd.read_excel(f5, sheet_name='risk_table')
+df_rss= pd.read_excel(f5, sheet_name='risk_summary')
 
 df_rd = df_rd.rename(columns={'Finish_Date': 'Finish'})
+pc_level = df_bm['pc_level'].values[0]
+print('% Complete Level: {}'.format(pc_level))
 
 # df_dl.sort_values(['RN'], ascending=False, inplace=True)
 df_mj = pd.read_excel(f1, sheet_name='major')
@@ -79,26 +89,32 @@ df_pr = df_pr[['domain_id', 'process_id']]
 domains = df_pr['domain_id'].unique()
 
 """ Closed Requirements """
-df_closed = df_rd[( df_rd['month'] <= today_mm ) & ( df_rd[pc] == 1 )]
+df_closed = df_rd[( df_rd['month'] < today_mm ) & ( df_rd[pc] >= pc_level )]
 df_closed = df_closed.copy()
-df_closed = df_closed[['value', 'Name', 'process_id', 'xRN', 'RN']]
+df_closed = df_closed[[pc, 'value', 'Name', 'process_id', 'xRN']]
 """ Finish Closed Requirements """
 
 """ Open Requirements """
-df_open = df_rd[( df_rd['month'] <= today_mm ) & ( df_rd[pc] < 1 )]
+df_open = df_rd[( df_rd['month'] < today_mm ) & ( df_rd[pc] < pc_level )]
 df_open = df_open.copy()
-df_open = df_open[['old_budget', 'Name', 'process_id', 'xRN', 'RN']]
+df_open = df_open[[pc, 'old_budget', 'Name', 'process_id', 'xRN']]
 """ Finish Open Requirements """
+YTD_closed = df_gt['YTD_Closed'].values[0] / (df_gt['YTD_Open'].values[0] + df_gt['YTD_Closed'].values[0])
+YTD_closed = f'{YTD_closed * 100:.1f}%'
+closed_pc_text = 'אחוז מימוש מצטבר {}'.format(YTD_closed)
 
 closed_text1 = '{} דרישות סגורות'.format(df_gt['YTD_Closed'].values[0])
 closed_text  ='במשקל {:,} נקודות'.format(int(df_closed['value'].sum()))
 
-open_text1   = '{} דרישות פתוחות'.format(df_gt['YTD_Open'].values[0])
-open_text    ='במשקל {:,} נקודות'.format(int(df_open['old_budget'].sum()))
+open_text1    = '{} דרישות פתוחות'.format(df_gt['YTD_Open'].values[0])
+open_text     ='במשקל {:,} נקודות. '.format(int(df_open['old_budget'].sum()))
+open_69       = '{} דרישות מתחת ל-69%'.format(df_gt['open_lt_69'].values[0])
+pc_level_text = 'סף לחישוב התקדמות: {}%'.format(int(pc_level * 100))
+# open_text += open_69
 
 df_closed['value'] = df_closed['value'].apply(lambda x: f'{x:.2f}')
 df_open['value']   = df_open['old_budget'].apply(lambda x: f'{x:.2f}')
-df_open = df_open[['value', 'Name', 'process_id', 'xRN', 'RN']]
+df_open = df_open[[pc, 'value', 'Name', 'process_id', 'xRN']]
 
 process_dict = {'select all...': ['select all...']}
 for x_key in domains:
@@ -110,6 +126,30 @@ rules_dict = [{'label': i, 'value': i} for i in rules]
 
 line_1 = motd.loc[0, 'text']
 line_2 = motd.loc[1, 'text']
+
+def annotation_position(*args, **kwargs):
+    figure = args[0]
+    figure.add_annotation(
+        yref        =  'paper',
+        text        =  kwargs.get('text'),
+        x           =  kwargs.get('x'),
+        y           =  kwargs.get('y'),
+        ax          =  kwargs.get('ax'),
+        ay          =  kwargs.get('ay'),
+        showarrow   =  True,
+        align       =  'center',
+        arrowhead   =  2,
+        arrowsize   =  3,
+        arrowcolor  =  '#636363',
+        bordercolor =  '#c7c7c7',
+        borderwidth =  1,
+        borderpad   =  4,
+        # bgcolor     =  '#ff7f0e',
+        bgcolor     = kwargs.get('bgcolor'),
+        opacity     =  0.8,
+        font        =  dict(size=18, color='black')
+    )
+    return figure
 
 def annotation_style_position(figure=go.Figure(), text=str, x_position=float):
     figure.add_annotation(
@@ -170,7 +210,7 @@ def home_page():
                                         style={'textAlign': 'center', 'font-size': 48}),
                         html.P(closed_text,
                                style={'textAlign': 'center', 'font-size': 24, 'color': 'Yellow'}),
-                        html.P('עד לסוף חודש זה', style={'textAlign': 'center', 'font-size': 18, 'color': 'Yellow'}),
+                        html.P('עד לסוף חודש: ' + today_mm, style={'textAlign': 'center', 'font-size': 18, 'color': 'Yellow'}),
                         dbc.Button('פירוט דרישות', id="open-closed-table", size='lg',
                                    color='secondary', outline=False,
                                    block=False),
@@ -184,13 +224,27 @@ def home_page():
                                 style={'textAlign': 'center', 'font-size': 48}),
                         html.P(open_text,
                                style={'textAlign': 'center', 'font-size': 24, 'color': 'Yellow'}),
-                        html.P('עד לסוף חודש זה', style={'textAlign': 'center', 'font-size': 18, 'color': 'Yellow'}),
+                        html.P('עד לסוף חודש: ' + today_mm, style={'textAlign': 'center', 'font-size': 18, 'color': 'Yellow'}),
                         dbc.Button('פירוט דרישות', id="open-open-table", size='lg',
                                    color='secondary', outline=False,
                                    block=False),
                     ]), color='#325d88', inverse=True
-                ), width={'size': 3, 'offset': 6}
+                ), width={'size': 3, 'offset': 0}
             ),
+            dbc.Col(
+                html.Div([
+                    dbc.Alert(
+                        '',
+                        color='warning',
+                        style={'textAlign': 'center', 'font-size': 24, 'color': '#8c564b'},
+                    ),
+                    dbc.Alert(
+                        pc_level_text,
+                        color='success',
+                        style={'textAlign': 'center', 'font-size': 24, 'color': '#8c564b'},
+                    ),
+                ]), width={'size': 2, 'offset': 2}
+            )
         ]),
         dbc.Modal([
             dbc.ModalBody(
@@ -204,7 +258,9 @@ def home_page():
                     sort_mode='single',
                     page_action='native',
                     page_current=0,
-                    page_size=20
+                    page_size=20,
+                    export_format='xlsx',
+                    export_headers='display'
                 )
             ),
             dbc.ModalFooter(
@@ -223,8 +279,10 @@ def home_page():
                     sort_mode='single',
                     page_action='native',
                     page_current=0,
-                    page_size=20
-                )
+                    page_size=20,
+                    export_format = 'xlsx',
+                    export_headers = 'display'
+    )
             ),
             dbc.ModalFooter(
                 dbc.Button('סגור', id='close-open-xl', className='ml-auto')
@@ -286,7 +344,7 @@ def home_page():
                 dbc.Button('clear marimekko selections', id='clear')
             )
         ]),
-        html.Hr(),
+        # html.Hr(),
         dbc.Row([
             dbc.Col(
                 dcc.Graph(id='marimekko-figure')
@@ -294,14 +352,14 @@ def home_page():
         ]),
         dbc.Row([
             dbc.Col(width=1),
-            dbc.Col(html.Div(id='requirements-table', lang='en', dir='ltr'), width=10),
+            dbc.Col(html.Div(id='requirements-table', lang='he', dir='ltr'), width=10),
             dbc.Col(width=1)
         ]),
         html.Hr(),
         dcc.Store(id='domain-id'),
         dcc.Store(id='df-requirements-data'),
         dcc.Store(id='rule-id'),
-        dcc.Store(id='clear-out')
+        dcc.Store(id='clear-out'),
     ], fluid=True)
     return layout
 
@@ -319,14 +377,22 @@ def page_1():
         dbc.Row([
             dbc.Col(width=1),
             dbc.Col(
-                dcc.Graph(id='risk-chart', figure=f_stacked), width=4
+                dcc.Graph(id='risk-stacked', figure=f_stacked), width=4
             ),
             dbc.Col(
-                dcc.Graph(id='risk-stacked', figure=f_risk), width=6
+                dcc.Graph(id='risk-chart', figure=f_risk), width=6
             ),
-            dbc.Col(width=1),
+            dbc.Col(width=1)
         ]),
-        html.Hr()
+        html.Hr(),
+        dbc.Row([
+            dbc.Col(width=1),
+            dbc.Col(
+                dbc.Col(html.Div(id='risk-table', lang='he', dir='ltr'), width=10),
+            ),
+            dbc.Col(width=1)
+        ]),
+        html.Hr(),
     ], fluid=True )
     return layout
 
@@ -444,7 +510,7 @@ def home_page_filter_data(selected_domain=str, selected_process=str, selected_ru
 
     is_0()
     selected_str, dfr, rule = function_list[f_index]()
-    fig = marimekko_chart(df_dev=dfr.copy())
+    fig = display_marimekko_chart(df_dev=dfr.copy())
     return selected_str, fig, dfr.to_dict('records'), selected_rule
 
 def display_bullet_chart():
@@ -472,21 +538,22 @@ def display_bullet_chart():
                 },
                 'bgcolor': 'white',
                 'steps': [
-                    {'range': [0, target-12],      'color': '#f74205'},
+                    {'range': [0, target-12],      'color': '#d9534f'},
                     {'range': [target-12, target], 'color': 'lightsalmon'},
-                    {'range': [target, 100],       'color': '#325d88'}
+                    {'range': [target, 100],       'color': '#93c54b'}
                 ],
                 'bar': {'color': 'MidNightBlue'}
             }
         ),
     )
-    target_text = 'target: {:.1f}%'.format(target)
-    actual_text = 'actual: {:.1f}%'.format(actual)
-    fig = annotation_style_position(figure=fig, text=target_text, x_position=target/100)
-    fig = annotation_style_position(figure=fig, text=actual_text, x_position=actual/100)
 
     # fig = annotation_style_position(figure=fig, text='נקודת המטרה', x_position=target/100 - 0.10)
-    t_text = '% Completion: Target vs. Actual'
+    # t_text = ' {:.1f}% <= {:.1f}%  מול יעד של {:.1f}% :ההתקדמות בפועל'.format(( actual/target ) * 100, actual, target)
+    target_text = '{:.1f}% יעד'.format(target)
+    actual_text = '{:.1f}% בפועל'.format(actual)
+    fig = annotation_position(fig, x=target/100, y=1.00, ax=0, ay=-50, text=target_text, bgcolor='#f47c3c')
+    fig = annotation_position(fig, x=actual/100, y=0.41, ax=0, ay= 70, text=actual_text, bgcolor='#f47c3c')
+    t_text = 'התקדמות בפועל אל מול יעד ההתקדמות'
     fig.update_layout(
         height=250,
         title={
@@ -572,9 +639,9 @@ def display_spi():
                 'borderwidth': 2,
                 'bordercolor': 'gray',
                 'steps': [
-                    {'range': [0.0, 0.6], 'color': 'crimson'},
-                    {'range': [0.6, 0.8], 'color': 'yellow'},
-                    {'range': [0.8, 1.0], 'color': 'green'}
+                    {'range': [0.0, 0.6], 'color': '#d9534f'},
+                    {'range': [0.6, 0.8], 'color': '#ffc107'},
+                    {'range': [0.8, 1.0], 'color': '#93c54b'}
                 ],
             }
         )
@@ -603,7 +670,7 @@ def display_spi():
     )
     return fig
 
-def marimekko_chart(df_dev=pd.DataFrame):
+def display_marimekko_chart(df_dev=pd.DataFrame):
     df_dev['month'] = pd.to_datetime(df_dev['Finish']).dt.strftime('%Y-%m')
     df_dev.sort_values('month', inplace=True)
     df_g = df_dev.groupby(['month']).agg({
@@ -646,9 +713,12 @@ def marimekko_chart(df_dev=pd.DataFrame):
     df_g['cumsum'] = df_g['cumsum'].shift(1)
     df_g.loc[0, 'cumsum'] = 0
 
-    t_yr = today.year
-    t_mn = 1 if today.month + 1 > 12 else today.month + 1
-    x0_rect = '{}-{}'.format(t_yr, f'{t_mn:0>2}')
+#     t_yr = today.year
+#     t_mn = 1 if today.month + 1 > 12 else today.month + 1
+#     x0_rect = '{}-{}'.format(t_yr, f'{t_mn:0>2}')
+    x0_rect = (pd.to_datetime(today_mm, format='%Y-%m') + pd.DateOffset(months=1)).strftime('%Y-%m')
+    print('marimekko x0_rect: ', x0_rect)
+
     x1_rect = df_g['month'].max()
     rect = True
 
@@ -716,18 +786,20 @@ def marimekko_chart(df_dev=pd.DataFrame):
         fig.add_vrect(
             x0=x0_vrect,
             x1=x1_vrect,
-            # fillcolor='#997c2e',
             fillcolor='darksalmon',
-            opacity=0.5,
+            opacity=0.6,
             layer='above',
             line_width=0
         )
-#         fig.add_vline(
-#             x=x_vline,
-#             line_width=3,
-#             line_dash='dash',
-#             line_color='green'
-#         )
+        fig.add_vline(
+            x=x0_vrect,
+            line_width=3,
+            line_dash='dash',
+            line_color='green'
+        )
+        fig = annotation_position(fig, x=x0_vrect, y=1.00, ax=-80, ay=-20, text='עבר', bgcolor='#f47c3c')
+        fig = annotation_position(fig, x=x0_vrect, y=1.00, ax= 80, ay=-20, text='עתיד', bgcolor='#f47c3c')
+        fig = annotation_position(fig, x=x0_vrect, y=0.80, ax= -180, ay=-20, text=closed_pc_text, bgcolor='#f8f5f0')
 
     annotations.append(dict(
         xref='paper',
@@ -772,12 +844,12 @@ def gantt_page_filter_data(selected_rule=str):
     df_completed    = df_ct.copy()
     df_deliverables = pd.DataFrame()
     if selected_rule  == 'INT':
-        fig = gantt_int()
+        fig = display_gantt_int()
     else:
-        fig = gantt_all(df1=df_gantt.copy(), df2=df_completed.copy(), df3=df_deliverables.copy())
+        fig = display_gantt_all(df1=df_gantt.copy(), df2=df_completed.copy(), df3=df_deliverables.copy())
     return fig
 
-def gantt_int():
+def display_gantt_int():
     fig = px.timeline(
         df_int,
         x_start='Start_Date',
@@ -869,7 +941,7 @@ def gantt_int():
     )
     return fig
 
-def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
+def display_gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
     df1['start']  = df1['Start_Date']
     df1['finish'] = df1['Finish_Date']
     fig = px.timeline(
@@ -911,7 +983,8 @@ def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
         line_color='blue'
     )
 
-    fig = annotation_style_position(figure=fig, text='היום',                 x_position=today)
+    fig = annotation_position(fig, x=today, y=1.00, ax=-100, ay=-40, text='אנחנו כאן', bgcolor='#f47c3c')
+    # fig = annotation_style_position(figure=fig, text='היום',                 x_position=today)
     fig = annotation_style_position(figure=fig, text='נקודת אינטגרציה',      x_position=dead_line)
     fig = annotation_style_position(figure=fig, text='נקודת אינטגרציה שניה', x_position=second_line)
 
@@ -919,12 +992,28 @@ def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
     fig.add_scatter(                   # progress marker
         y=df2['process_id'],
         x=df2['c_date'],
-        name='progress',
+        name='SAP progress',
         mode='markers+text',
-        marker={'size': 8, 'symbol': 'square', 'color': 'black'},
-        text=['{:.0%}'.format(df2.logmar_pc[i]) for i in range(len(df2))],
+        marker={'size': 6, 'symbol': 'circle', 'color': 'black'},
+        text=['{:.0%}'.format(df2.sap_pc[i]) for i in range(len(df2))],
         hovertemplate='<b>%{text}</b>',
         textposition='top center',
+        showlegend=True
+    )
+    """
+    fig.add_scatter(                   # Dev Start Date
+        y=df2['process_id'],
+        x=df2['dev_sd'],
+        name='תחילת סאפ',
+        mode='markers',
+        marker={'size': 8, 'symbol': 'diamond', 'color': 'rgb(246, 207, 113)', 'line': {'color': 'MediumPurple', 'width': 1}},
+        text=[df2.dev_fd[i].strftime('%d/%m/%Y') for i in range(len(df2))],
+        hovertemplate='%{text}',
+        textposition='bottom center',
+        textfont=dict(
+            # color='rgb(246, 207, 113)',
+            color='rgb(138, 109, 39)',
+        ),
         showlegend=True
     )
     fig.add_scatter(                   # Dev Finish Date
@@ -942,26 +1031,43 @@ def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
         ),
         showlegend=True
     )
+    """
 
-    progress_line = config['progress_line']
-    history_line  = config['history_line']
-    p_line = []
-    h_line = []
-    y_size = len(df2['process_id']) - 1
-    for i, x in enumerate(df2['process_id']):
-        progress_line['x0'] = df2.Start_Date[i]
-        progress_line['x1'] = df2.c_date[i]
-        progress_line['y0'] = y_size - i      #   df2.process_id[i]
-        progress_line['y1'] = y_size - i      #   df2.process_id[i]
-        fig.add_shape(progress_line, name='progress')
+#     progress_line = config['progress_line']
+#     history_line  = config['history_line']
+#     p_line = []
+#     h_line = []
+#     y_size = len(df2['process_id']) - 1
+#     for i, x in enumerate(df2['process_id']):
+#         progress_line['x0'] = df2.Start_Date[i]
+#         progress_line['x1'] = df2.c_date[i]
+#         progress_line['y0'] = y_size - i      #   df2.process_id[i]
+#         progress_line['y1'] = y_size - i      #   df2.process_id[i]
+#         fig.add_shape(progress_line, name='progress')
+#
+#         # history_line['x0'] = progress_line['x0']   # df2.Start_Date[i]
+#         # history_line['x1'] = df2['bl-finish'][i]
+#         # history_line['y0'] = y_size - i - 0.35
+#         # history_line['y1'] = y_size - i - 0.35
+#         # fig.add_shape(history_line, yref='y')
+#         df2['y_size'] = y_size - i
 
-        # history_line['x0'] = progress_line['x0']   # df2.Start_Date[i]
-        # history_line['x1'] = df2['bl-finish'][i]
-        # history_line['y0'] = y_size - i - 0.35
-        # history_line['y1'] = y_size - i - 0.35
-        # fig.add_shape(history_line, yref='y')
-        df2['y_size'] = y_size - i
-
+    for process_id in df_pd['process_id'].unique():
+        dff = df_pd[df_pd['process_id'] == process_id]
+        fig.add_trace(
+            go.Scatter(
+                x=dff['process_date'],
+                y=dff['process_id'],
+                mode='lines+markers',
+                showlegend=False,
+                line=dict(
+                    color='royalblue',
+                    width=2
+                ),
+                text=[df2.dev_fd[i].strftime('%d/%m/%Y') for i in range(len(df2))],
+                hoverinfo='none'
+            ),
+        )
     fig.update_xaxes(title_font_family='Arial')
 
     """ Major and M4N Milestones """
@@ -1017,14 +1123,21 @@ def gantt_all(df1=pd.DataFrame, df2=pd.DataFrame, df3=pd.DataFrame):
             xanchor='left',
             x=-0.07
         ),
-        title=config['style_title']
+        title=config['style_title'],
+        legend_title_text='מקרא'
+    )
+    fig.update_xaxes(
+        dtick='M1',
+        ticklabelmode='period'
     )
     fig.data[1]['marker']['opacity'] = 1.0
-    fig.data[2]['marker']['opacity'] = 0.62
-    fig.data[2]['marker']['width']   = 0.5
+    fig.data[2]['marker']['opacity'] = 1.0
+
+    fig.data[1]['width'] = 0.9
+    fig.data[2]['width'] = 0.5
     return fig
 
-def gantt_contract():
+def display_gantt_contract():
     dff = df_mj[['line', 'task', 'start', 'finish', 'months']]
     dff = dff.copy()
     dff['months'] = dff['months'].apply(lambda x: f'{x:.1f}')
@@ -1375,7 +1488,8 @@ def display_requirements_table(dff=pd.DataFrame(), selected_month=str):
         dff = dff[mask_1 & mask_2]
 
     df_tmp = dff.copy()
-    df_tmp = df_tmp[[pc, 'Finish', 'Name', 'RN', 'xRN', 'process_id', 'domain_id']]
+    df_tmp = df_tmp[[pc, 'Finish', 'Name', 'rule', 'xRN', 'process_id', 'domain_id']]
+    df_tmp[pc] = df_tmp[pc].apply(lambda x: f'{x:.2f}')
     df_tmp['Finish'] = pd.to_datetime(df_tmp['Finish']).dt.strftime('%d/%m/%Y')
     dff_table = dt.DataTable(
         data=df_tmp.to_dict('records'),
@@ -1387,10 +1501,253 @@ def display_requirements_table(dff=pd.DataFrame(), selected_month=str):
         sort_mode='single',
         page_action='native',
         page_current=0,
-        page_size=20
+        page_size=20,
+        export_format='xlsx',
+        export_headers='display'
     )
     return dff_table
 
+def display_risktable(month=str, text=str):
+    if month is not None:
+        color = df_rss[( df_rss['indexDT'] == month ) & ( df_rss['size'] == int(text) )]['color'].values[0]
+        dff   = df_rsk[( df_rsk['indexDT'] == month ) & ( df_rsk['color'] == color )]
+    else:
+        dff = df_rsk.copy()
+
+    dff = dff[['comments', 'reduction actions', 'risk source', 'risk', 'severity', 'probability', 'Name']]
+    dff.columns = ('comments', 'actions', 'source', 'level', 'severity', 'probability', 'description')
+    dff_table = dt.DataTable(
+        data=dff.to_dict('records'),
+        columns=[{'name': i, 'id': i, 'deletable': False} for i in dff.columns if i != 'id'],
+        style_cell=style_cell,
+        style_header=style_header,
+        filter_action='native',
+        sort_action='native',
+        sort_mode='single',
+        page_action='native',
+        page_current=0,
+        page_size=20,
+        export_format='xlsx',
+        export_headers='display'
+    )
+    return dff_table
+
+
+def display_risk_stacked():
+    fig = px.bar(
+        df_rss,
+        x='indexDT',
+        y='size',
+        color='color',
+        color_discrete_sequence=['#d9534f', '#ffc107', '#93c54b'],
+        text='size'
+    )
+
+    fig.update_traces(
+        textposition='inside',
+        textfont_size=32,
+    )
+
+    fig.update_layout(
+        title='Risk Management',
+        xaxis_title='Dates',
+        yaxis_title='# of Risks',
+        font=dict(
+            family='Courier New, monospace',
+            size=18,
+            color="RebeccaPurple"
+        ),
+        paper_bgcolor = '#f8f5f0',
+        plot_bgcolor  = '#c7d6cb',
+        height = 600,
+        uniformtext=dict(
+            minsize=10,
+            mode='hide'
+        ),
+    )
+    return fig
+
+def display_risk_heatmap():
+    z_text = np.empty((5, 5), dtype=int)
+    z_text[:] = 0
+    z_text = [
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', ''],
+        ['', '', '', '', '']
+    ]
+
+    z = [
+        [5, 10, 15, 20, 25],
+        [4, 8, 12, 16, 20],
+        [3, 6, 9, 12, 15],
+        [2, 4, 6, 8, 10],
+        [1, 2, 3, 4, 5]
+    ]
+    df_risk = df_rsk.copy()
+    max_index_date = df_risk['indexDT'].max()
+    print('max risk date: ', max_index_date)
+    df_risk = df_risk[( df_risk['risk'] > 1 ) & ( df_risk['indexDT'] == max_index_date )]
+    df_risk = df_risk[['risk', 'Name', 'severity', 'probability']]
+    df_risk['severity'] = df_risk['severity'] - 1
+    df_risk['probability'] = df_risk['probability'] - 1
+
+    df_risk = df_risk.groupby(['severity', 'probability']).size()
+    df_risk = df_risk.to_frame()
+    df_risk = df_risk.rename(columns={0: 'count_x'})
+    df_risk.reset_index(inplace=True)
+
+    for index, row in df_risk.iterrows():
+        x = row.severity
+        y = row.probability
+        z_text[x][y] = str(row.count_x)
+
+    z_text = np.flip(z_text, 0)
+
+    x = [1, 2, 3, 4, 5]
+    y = [5, 4, 3, 2, 1]
+    font_colors = ['black']
+
+    fig = ff.create_annotated_heatmap(
+        z,
+        x=x,
+        y=y,
+        annotation_text=z_text,
+        colorscale=[
+            [0.00, 'rgb(56, 158, 39)'],
+            [0.32, 'rgb(247, 247, 5)'],
+            [0.60, 'rgb(244, 109, 67)'],
+            [1.00, 'rgb(165, 0, 38)'],
+        ],
+        colorbar=dict(
+            title='Risk Level'
+        ),
+        font_colors=font_colors,
+        showscale=True,
+        hoverinfo='none'
+    )
+
+    for i in range(len(fig.layout.annotations)):
+        fig.layout.annotations[i].font.size = 32
+
+    fig.update_layout(
+        title='Risk Management',
+        xaxis_title='Severity',
+        yaxis_title='Probability',
+        font=dict(
+            family='Courier New, monospace',
+            size=18,
+            color="RebeccaPurple"
+        ),
+        paper_bgcolor='#f8f5f0',
+        plot_bgcolor='#c7d6cb',
+        height=600,
+    )
+    return fig
+
+def app_navbar(app):
+    navbar = dbc.Navbar(
+        dbc.Container(
+            [
+                dcc.Location(id="url", refresh=True),
+                html.A(
+                    dbc.Row([
+                        html.Img(src=app.get_asset_url('logo.png'), height='30px'),
+                        dbc.NavbarBrand(
+                            'מערכת לניהול מרה"ס שלב ג',
+                            className="ml-2",
+                            style={
+                                'font-size': 14,
+                                'text-decoration': 'none'
+                            },
+                            href='/page-2'
+                        ),
+                    ]), href='/page-2'
+                ),
+                dbc.NavbarToggler(id="navbar-toggler"),
+                dbc.Collapse(
+                    dbc.Nav([
+                        dbc.NavLink(
+                            'בית',
+                            href="/",
+                            active="exact",
+                            style={
+                                'font-size': 14,
+                                'text-decoration': 'none'
+                            }
+                        ),
+                        dbc.NavLink(
+                            "MTA...",
+                            href="/page-1",
+                            active="exact",
+                            style={
+                                'font-size': 14,
+                                'text-decoration': 'none'
+                            }
+                        ),
+                        dbc.NavLink(
+                            'דשבורד',
+                            href="/page-2",
+                            active="exact",
+                            style={
+                                'font-size': 14,
+                                'text-decoration': 'none'
+                            }
+                        ),
+                    ], className="ml-auto", navbar=True),
+                    id="navbar-collapse",
+                    navbar=True,
+                ),
+            ], fluid=True
+        ),
+        color="dark",
+        dark=True,
+        className="mb-5",
+    )
+    return navbar
+
+""" prepare figures """
+f_mta     = mta_fig()
+f_major   = display_gantt_contract()
+f_risk    = display_risk_heatmap()
+f_stacked = display_risk_stacked()
+f_evm     = display_evm()
+f_spi     = display_spi()
+f_bullet  = display_bullet_chart()
+
+# f_dl      = display_deliverable()
+
+#     if shafir:
+#         fig.add_trace(go.Scatter(
+#             name='shafir',
+#             x=df_sf['x'],
+#             y=df_sf['y'],
+#             mode='markers+text',
+#             marker={'size': 18, 'symbol': 'diamond', 'color': 'darksalmon'},
+#             text=df_sf['C_MS'],
+#             textposition='top center',
+#             hovertemplate='%{text}',
+#             textfont=dict(
+#                 family='sans serif',
+#                 size=14,
+#                 color='Lightsalmon'
+#             )
+#         ))
+
+#     if bl_baseline:
+#         moshe = True
+#     fig.add_trace(go.Scatter(
+#         x=baseline_x,
+#         y=baseline_y,
+#         mode='lines',
+#         name='baseline',
+#         line=dict(
+#             color='yellow',
+#             width=4
+#         ),
+#         opacity=0.7
+#     ))
 """
 def display_deliverable():
     fig = go.Figure()
@@ -1452,105 +1809,3 @@ def display_deliverable():
     )
     return fig
 """
-def app_navbar(app):
-    navbar = dbc.Navbar(
-        dbc.Container(
-            [
-                dcc.Location(id="url", refresh=True),
-                html.A(
-                    dbc.Row([
-                        html.Img(src=app.get_asset_url('logo.png'), height='30px'),
-                        dbc.NavbarBrand(
-                            'מערכת לניהול מרה"ס שלב ג',
-                            className="ml-2",
-                            style={
-                                'font-size': 14,
-                                'text-decoration': 'none'
-                            },
-                            href='/page-2'
-                        ),
-                    ]), href='/page-2'
-                ),
-                dbc.NavbarToggler(id="navbar-toggler"),
-                dbc.Collapse(
-                    dbc.Nav([
-                        dbc.NavLink(
-                            'בית',
-                            href="/",
-                            active="exact",
-                            style={
-                                'font-size': 14,
-                                'text-decoration': 'none'
-                            }
-                        ),
-                        dbc.NavLink(
-                            "MTA...",
-                            href="/page-1",
-                            active="exact",
-                            style={
-                                'font-size': 14,
-                                'text-decoration': 'none'
-                            }
-                        ),
-                        dbc.NavLink(
-                            'דשבורד',
-                            href="/page-2",
-                            active="exact",
-                            style={
-                                'font-size': 14,
-                                'text-decoration': 'none'
-                            }
-                        ),
-                    ], className="ml-auto", navbar=True),
-                    id="navbar-collapse",
-                    navbar=True,
-                ),
-            ], fluid=True
-        ),
-        color="dark",
-        dark=True,
-        className="mb-5",
-    )
-
-    return navbar
-
-f_mta     = mta_fig()
-f_major   = gantt_contract()
-# f_dl      = display_deliverable()
-f_risk    = r_heatmap.risk_heatmap()
-f_stacked = r_stacked.r_stacked_fig()
-f_evm     = display_evm()
-f_spi     = display_spi()
-f_bullet  = display_bullet_chart()
-
-
-#     if shafir:
-#         fig.add_trace(go.Scatter(
-#             name='shafir',
-#             x=df_sf['x'],
-#             y=df_sf['y'],
-#             mode='markers+text',
-#             marker={'size': 18, 'symbol': 'diamond', 'color': 'darksalmon'},
-#             text=df_sf['C_MS'],
-#             textposition='top center',
-#             hovertemplate='%{text}',
-#             textfont=dict(
-#                 family='sans serif',
-#                 size=14,
-#                 color='Lightsalmon'
-#             )
-#         ))
-
-#     if bl_baseline:
-#         moshe = True
-#     fig.add_trace(go.Scatter(
-#         x=baseline_x,
-#         y=baseline_y,
-#         mode='lines',
-#         name='baseline',
-#         line=dict(
-#             color='yellow',
-#             width=4
-#         ),
-#         opacity=0.7
-#     ))

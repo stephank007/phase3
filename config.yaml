@@ -1,5 +1,5 @@
 dates:
-  gantt:   11/08/2021
+  gantt:   02/09/2021
   int_1:   30/04/2022
   int_2:   30/08/2022
   bl_date: 22/06/2021
@@ -9,6 +9,7 @@ execution_params:
   moria   : no
   history : no
   baseline: yes
+  pc_level: 1.0
 
 config:
   bin_path     : .
@@ -35,10 +36,10 @@ config:
   c_status     : _out/current_status.xlsx
   int-out      : _out/int-out.xlsx
   dev-cmp      : _out/dev-compare.xlsx
-  in-out       : _out/dev-io.xlsx
+  dev-io       : _out/dev-io.xlsx
+  in-out       : _out/in-out.xlsx
   risk-out     : _out/risk_out.xlsx
-  risk-s-out   : _out/risk_stacked_out.xlsx
-  json_data    : _out/moshe.txt
+  # risk-s-out   : _out/risk_stacked_out.xlsx
   sig_file     : ‏‏סבב חתימות 7.10.20.xlsx
   gantt_bl     : L:\projects\history\data\baseline\g_data_x.xlsx
   ms_path      : C:\Program Files\Microsoft Office\root\Office16
@@ -73,6 +74,11 @@ history:
   c_status     : current_status.xlsx
   consolidated : p3-consolidated.xlsx
   requirements : h_requirements.xlsx
+
+project_major_steps:
+  - A-00 # Integration
+  - B-00 # FAT
+  - C-00 # SAT
 
 requirements_type:
   BP : BP
@@ -446,7 +452,7 @@ skeleton_columns:
   - due_date
   - parent
   - rule
-  - Deadline
+#  - Deadline
   - task_notes
 #  - task_notes_2
 #  - function_requirement_reference
@@ -484,10 +490,10 @@ consolidated_columns:
   - due_date
   - parent
   - rule
-  - Deadline
+#  - Deadline
   - task_notes
   - task_notes_2
-  # - function_requirement_reference
+#  - function_requirement_reference
 #  - sub_process
   - source
   - Outline Level
@@ -574,7 +580,7 @@ realization_columns_map: {
   תהליך                            : logmar_process,
   'הערות קפטי"ה'                   : logmar_notes,
   Task Name                        : Name,
-  RN                               : xRN
+  RN                               : xRN,
 }
 
 s_rule_map: {
@@ -596,6 +602,11 @@ s_rule_map: {
   WMS/TMS        : WMS,
   IMP            : SAP,
   INT            : INT,
+  ממשקים->WMS    : WMS,
+  'ממשקים? SAP'    : Question,
+  ממשקים- > WMS  : WMS,
+  ממשקים -> WMS  : WMS,
+  SAP-> WMS      : WMS,
 }
 
 realization_columns:
@@ -675,11 +686,11 @@ style_cell : {
   'textOverflow'   : 'ellipsis',
   'whiteSpace'     : 'normal',
   'maxWidth'       : 0,
-  'padding'        : '3px',
+  'padding'        : '5px',
   'border'         : '1px solid blue',
   'backgroundColor': 'rgb(230, 235, 223)',
-  'textAlign'      : 'center',
-  'font_size'      : '12px',
+  'textAlign'      : 'right',
+  'font_size'      : '16px',
 }
 
 style_header : {
